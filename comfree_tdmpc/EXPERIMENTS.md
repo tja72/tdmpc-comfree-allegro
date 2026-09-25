@@ -175,6 +175,18 @@ Loads the checkpoints `outputs/vec/dagger_b30` and `outputs/ablation/d_termq`
 `dagger_b30` at 3 x 128 samples reaches 4.81 goals/ep at 146 ms per plan call,
 versus 4.69 goals/ep at 221 ms for `d_termq` at the full 3 x 256.
 
+Repetitions 2 and 3 (same script and seed, the checkpoints of the second and third
+training repetitions):
+
+```bash
+python scripts/report/ablate_rollout_budget.py --runs outputs/vec/dagger_b30_rep2 outputs/ablation_rep2/d_termq --out outputs/rollout_budget_rep2
+python scripts/report/ablate_rollout_budget.py --runs outputs/vec/dagger_b30_rep3 outputs/ablation_rep3/d_termq --out outputs/rollout_budget_rep3
+```
+
+Result over the three pairs: `d_termq` is at or above `dagger_b30` at every budget on
+the mean (3 x 256: 4.76 ± 0.33 vs 4.64 ± 0.52; 3 x 128: 4.61 ± 0.34 vs 4.28 ± 0.53).
+The advantage of `dagger_b30` is specific to repetition 1.
+
 ## 8. Variance reruns
 
 ```bash
