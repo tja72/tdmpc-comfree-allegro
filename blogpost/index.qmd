@@ -1,0 +1,33 @@
+---
+title: "Planning Through a Simulator"
+subtitle: "TD-M(PC)² with ComFree-Sim as the world model, for in-hand cube reorientation"
+author: "Tim Althaus"
+date: 2026-09-28
+---
+
+{{< include sections/tldr.qmd >}}
+
+{{< include sections/intro.qmd >}}
+
+{{< include sections/background.qmd >}}
+
+{{< include sections/method.qmd >}}
+
+{{< include sections/setup.qmd >}}
+
+{{< include sections/results.qmd >}}
+
+{{< include sections/limitations.qmd >}}
+
+{{< include sections/conclusion.qmd >}}
+
+{{< include sections/reproducibility.qmd >}}
+
+{{< include sections/acknowledgements.qmd >}}
+
+## References {.unnumbered}
+
+::: {#refs}
+:::
+
+{{< include sections/appendix.qmd >}}

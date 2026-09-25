@@ -1,0 +1,3 @@
+## Acknowledgements {.unnumbered}
+
+This project was developed together with Jiayun Li. Claude (Anthropic) was used as an AI assistant for code development, analysis and drafting of this post; all results and conclusions were verified by the author.

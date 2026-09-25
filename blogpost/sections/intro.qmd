@@ -1,0 +1,16 @@
+## Introduction {#sec-intro}
+
+TD-MPC2 [@hansen2024tdmpc2] and its successor TD-M(PC)² [@lin2025tdmpc2square] learn a latent world model from their own data and plan with it. For contact-rich dexterous manipulation that model is hard to learn: contacts make and break, errors compound over a rollout, and the agent rediscovers physics that is already known. A GPU simulator provides that physics and runs thousands of copies in parallel, but rigid contact makes its rollouts non-smooth in actions and parameters, and its parameters never match the real system exactly. ComFree-Sim [@borse2026comfree] has a smooth, analytical contact model, which helps both planning and fitting parameters from data.
+
+In this post I replace TD-M(PC)²'s learned world model with ComFree-Sim and learn only the value, the policy and the simulator's physical parameters. The task is in-hand cube reorientation with a simulated Allegro hand. "Reality" is the same simulator with 71 perturbed parameters, so the gap to be closed is purely parametric, and there is no real robot (@sec-setup). <!-- F:T7 --> @fig-hero shows the best agent. I ask four questions:
+
+1. Can a simulator replace the learned model inside TD-M(PC)²?
+2. What still has to be learned?
+3. How does it compare with the learned-model original? <!-- PENDING:baseline -->(Run in progress.)<!-- /PENDING -->
+4. What does online parameter identification buy?
+
+My contributions:
+
+- An agent that plans with MPPI through a bank of 4096 ComFree worlds, adds a learned terminal Q and identifies 71 simulator parameters online (@sec-method). <!-- F:P4 --> <!-- F:S2 -->
+- An ablation over 3 repetitions per configuration that isolates the terminal value as the largest lever (@sec-results). <!-- F:R5 -->
+- Negative results on distilling the planner into a policy: none of the fixes I tried closes the gap.

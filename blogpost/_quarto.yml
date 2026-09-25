@@ -1,0 +1,36 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd          # sections/*.qmd are {{< include >}}d, never rendered on their own
+  resources:
+    - videos/*.mp4
+    - figures/hero_poster.png
+
+website:
+  title: "Planning Through a Simulator"
+  site-url: https://tja72.github.io/tdmpc-comfree-allegro/
+  repo-url: https://github.com/tja72/tdmpc-comfree-allegro
+  repo-subdir: blogpost
+  page-navigation: false
+
+bibliography: references.bib
+filters:
+  - filters/strip-comments.lua
+link-citations: true
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    html-math-method: katex
+    css: styles.css
+    toc: true
+    toc-depth: 2
+    number-sections: false
+    fig-cap-location: bottom
+    code-fold: true
+    smooth-scroll: true
+    citations-hover: true
+    footnotes-hover: true

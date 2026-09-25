@@ -1,0 +1,3 @@
+## Conclusion {#sec-conclusion}
+
+Replacing TD-M(PC)²'s learned world model with ComFree works for in-hand cube reorientation, but only with a learned terminal value, which cuts the planner's drop rate from 0.77 to 0.02. <!-- F:R5 --> Online SysID corrects the contact constants and little else. The distilled policy stays far behind the planner, and none of my interventions closed that gap. <!-- PENDING:baseline -->Whether a learned world model does better at equal env steps is still open; the TD-MPC2 run has not finished yet.<!-- /PENDING -->

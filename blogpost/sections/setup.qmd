@@ -1,0 +1,15 @@
+## Experimental setup {#sec-setup}
+
+**Task.** A simulated 16-DoF Allegro hand [@allegrohand] sets joint position targets at 50 Hz to rotate a cube to a goal: the start orientation yawed by $\pm\,\mathcal U(0.6,\pi)$ rad. <!-- F:T1 --> <!-- F:T2 --> <!-- F:T5 --> After 10 consecutive steps within 0.4 rad a new goal is drawn, so goals per episode (G) is a rate. <!-- F:T5 --> Episodes last 120 steps (2.4 s); a drop ends them with −50. <!-- F:T1 --> <!-- F:T6 -->
+
+**"Reality".** There is no real robot. "Reality" is the same ComFree simulator with its 71 parameters perturbed once,
+
+$$
+u^\star=\Pi\big(u^{\text{nom}}+\delta\big),\qquad \delta\sim\mathcal U(-0.25,\,0.25)^{71},
+$$
+
+redrawn until the hand holds the cube stably. <!-- F:T7 --> The planner starts from $\hat u=u^{\text{nom}}$, so the gap is purely parametric. <!-- F:T7 -->
+
+**Protocol.** 16 environments step in lockstep for 150k env steps. Two configurations were also run to 300k. <!-- F:T8 --> <!-- F:R9 --> The policy is evaluated every 5k steps, the planner every 25k (16 episodes each). <!-- F:B3 --> <!-- F:C1 --> Metrics are G and drop rate as tail means (last 3 planner or 6 policy evaluations), ± std over 3 repetitions unless noted: same-seed reruns on a nondeterministic GPU simulator. <!-- F:C1 -->
+
+**Baselines.** Pure RL is the same actor-critic without a planner [@haarnoja2018sac]; planner-only is MPPI at the true parameters without learning. <!-- F:R2 --> <!-- F:R1 --> The learned-model baseline is TD-MPC2 with the TD-M(PC)² actor loss [@hansen2024tdmpc2; @lin2025tdmpc2square], run for 1M steps on the same task code and "reality". <!-- F:B1 --> <!-- F:B2 --> <!-- PENDING:baseline -->Its results are pending.<!-- /PENDING --> Caveats: one run, timeouts count as terminal, different evaluation cadence and hyperparameters. <!-- F:B3 -->

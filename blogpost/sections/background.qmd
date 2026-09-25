@@ -1,0 +1,15 @@
+## Background {#sec-background}
+
+**TD-MPC2 and TD-M(PC)².** TD-MPC2 [@hansen2024tdmpc2] learns an encoder, latent dynamics, a reward head, an ensemble of Q-functions and a policy $\pi$, all in one latent space. It plans by rolling sampled action sequences, some from $\pi$, out in the latent model and scoring them by predicted rewards plus a terminal $Q$. The policy is trained SAC-style [@haarnoja2018sac] to maximise $Q$. Since the planner, not $\pi$, picks the executed actions, $Q$ is learned from off-policy data and can overestimate the value of $\pi$'s actions. TD-M(PC)² [@lin2025tdmpc2square] adds a policy-prior term to the actor loss, the log-likelihood of the planner's actions under $\pi$, which keeps the policy close to the planner's action distribution. <!-- F:M7 -->
+
+**MPPI** [@williams2017mppi] keeps a Gaussian over action sequences of length $H$. Each iteration samples candidates $a^{(k)}$, computes their scores $V_k$ with the model and refits the Gaussian to the elite set $\mathcal E$ with exponential weights at temperature $\lambda$:
+
+$$
+w_k=\frac{\exp\big(\lambda(V_k-\max_j V_j)\big)}{\sum_{k'\in\mathcal E}\exp\big(\lambda(V_{k'}-\max_j V_j)\big)},\quad
+\mu_t=\sum_{k\in\mathcal E} w_k\, a^{(k)}_t,\quad
+\sigma_t=\sqrt{\textstyle\sum_{k\in\mathcal E} w_k \big(a^{(k)}_t-\mu_t\big)^2}.
+$$
+
+After the last iteration the first action is executed, and the shifted mean warm-starts the next step.
+
+**ComFree-Sim.** ComFree-Sim [@borse2026comfree; @comfreewarp2026code] implements the complementarity-free contact model of @jin2025comfree: contact forces are computed analytically, with a stiffness and a damping constant, instead of by solving a complementarity problem. <!-- F:S2 --> The dynamics are smooth in state, actions and parameters. It is built on MuJoCo-Warp [@mujocowarp], the GPU version of MuJoCo [@todorov2012mujoco] written in NVIDIA Warp [@macklin2022warp]. Every world in a batch can carry its own parameters. I use this for the planner's bank of 4096 worlds and for the batch of 528 finite-difference probe worlds in system identification. <!-- F:P4 --> <!-- F:S5 --> @sec-method computes $V$ with ComFree rollouts at the identified parameters $\hat u$ instead of latent rollouts.

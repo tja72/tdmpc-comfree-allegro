@@ -1,0 +1,48 @@
+## Method {#sec-method}
+
+![What is learned (orange) and what is given (blue). Transitions from "reality" feed two learners: SysID fits the simulator parameters $\hat u$, and TD learning fits $Q$ and $\pi$. The planner rolls out 4096 ComFree worlds at $\hat u$ and scores them with the analytic task reward plus the terminal $Q$.](figures/architecture.svg){#fig-architecture}
+
+**Learned vs given.** The agent keeps TD-M(PC)²'s value and policy learning but drops its world model (@fig-architecture). It learns an encoder, an ensemble of 5 Q-heads and a squashed-Gaussian policy $\pi$. <!-- F:M1 --> The dynamics are given by ComFree rollouts at the current estimate $\hat u$, and the reward is the same analytic function that scores "reality". <!-- F:M2 --> There is no latent dynamics model and no consistency loss. The encoder only featurises observations for $Q$ and $\pi$ and is trained through the value loss. <!-- F:M3 -->
+
+**Planning through 4096 worlds.** The planner is MPPI with horizon $H=8$, 3 iterations and 256 samples per environment, 24 of them drawn from $\pi$. <!-- F:P1 --> The samples of all 16 environments share one bank of 4096 ComFree worlds, so each rollout costs 8 batched control steps. <!-- F:P4 --> Each sequence gets the score
+
+$$
+V(\tau)=\sum_{t=0}^{H-1}\gamma^{t}\,m_t\,r(s_t,a_t,s_{t+1})\;+\;\gamma^{H}\,m_H\,\min\!\big(Q_i,Q_j\big)\!\big(z_H,\tilde a_H\big),\qquad s_{t+1}=f_{\text{ComFree}}(s_t,a_t;\hat u),
+$$
+
+where the mask $m_t$ becomes 0 after a drop (the drop penalty still counts), $z_H$ is the encoded final state, $\tilde a_H\sim\pi(\cdot\mid z_H)$, $\gamma=0.95$, and $Q_i,Q_j$ are two random heads. <!-- F:P2 --> <!-- F:M5 --> The terminal term switches on after 20k env steps. <!-- F:P3 --> Weights and updates follow the MPPI rule in @sec-background. In evaluation the agent executes the first action of the weighted elite mean; in training it samples one elite by weight and adds the planner's first-step noise, as in TD-MPC2. The next call warm-starts from the shifted mean. <!-- F:P5 --> With elite harvesting, the top-8 elites of the last iteration are stored as extra transitions, and training batches mix them 50/50 with real data. <!-- F:P6 -->
+
+**System identification.** SysID estimates 71 parameters in five groups (@tbl-params). <!-- F:S2 --> Each parameter is mapped to $[0,1]$ (log-uniformly for scale factors). <!-- F:S3 -->
+
+| group | n | parameters | range |
+|---|---|---|---|
+| joint | 48 | damping, armature, friction loss per DoF | ×0.3–3 (damping); 0–2e-3; 0–1e-2 |
+| actuator | 8 | position gains $k_p$, $k_v$, shared across fingers | ×0.5–2 |
+| contact | 7 | sliding friction per geom group, cube sliding and torsional friction | ×0.3–3 |
+| inertial | 6 | finger masses, cube mass, cube inertia | ×0.7–1.4; ×0.4–2.5; ×0.5–2 |
+| comfree | 2 | ComFree contact stiffness and damping | ×0.3–3 |
+
+: The 71 identified parameters. "×" ranges scale the nominal value; the others are additive (nominal 0). {#tbl-params}
+
+<!-- F:S2 -->
+
+The loss replays $M=16$ chunks of $L=5$ real control steps (0.1 s) open-loop from their recorded states and actions:
+
+$$
+\mathcal L(u)=\frac1M\sum_{m=1}^{M}\log\!\Big(1+\frac1L\sum_{t=1}^{L}\min\big(e_{m,t}(u),10^3\big)\Big),\quad
+e=w_q\|\Delta q^{\text{hand}}\|^2+w_p\|\Delta p^{\text{cube}}\|^2+w_\theta\,\Delta\theta_{\text{cube}}^2+w_v\|\Delta\dot q\|^2 ,
+$$
+
+with weights 1, 20, 1 and 0.02 on hand joints, cube position, cube orientation angle and velocities. <!-- F:S4 --> SysID does **not** differentiate through the simulator. It uses batched central finite differences along $K=16$ random unit directions $d_k$: <!-- F:S1 --> <!-- F:S5 -->
+
+$$
+\hat g=\frac{P}{K}\sum_{k=1}^{K}\frac{\mathcal L(\Pi(u+\varepsilon d_k))-\mathcal L(\Pi(u-\varepsilon d_k))}{2\varepsilon}\,d_k ,
+$$
+
+with $\varepsilon=0.02$, $P=71$ and $\Pi$ the clip to $[0,1]^{71}$. All probes run as one batch of 528 worlds. <!-- F:S5 --> Finite differences work because ComFree's contact law is smooth: the loss varies gradually with $u$, whereas with hard contact a small perturbation can switch contacts on or off. Each call takes 30 normalised-momentum steps and keeps the iterate with the lowest held-out loss. <!-- F:S6 --> SysID runs every 5k env steps, takes about 2 s, and writes $\hat u$ into all planner worlds. <!-- F:S7 -->
+
+**Parallelisation.** One ComFree world costs 2.65 ms per control step. The planner's 4096 worlds cost 22.8 ms, which is 1.80M physics steps/s (@fig-throughput). <!-- F:H1 --> In a benchmark plan call over 256 worlds, the networks take only 4.4 ms of 331 ms. <!-- F:H2 --> Planning 16 environments together gives 4.19× the env-step rate of one. <!-- F:H3 -->
+
+![Simulation cost vs number of parallel ComFree worlds: time per control step for the whole batch (left) and physics steps per second (right). The dotted line marks the planner's bank. Single benchmark run; the machine was not recorded.](figures/throughput.svg){#fig-throughput}
+
+**Deviations from TD-M(PC)².** I also use a fixed discount, 1-step TD targets in which only a drop is terminal, smaller networks (width 384, latent 256), value weight 1.0 instead of 0.1, prior weight 0.5 instead of 1.0, coloured sampling noise, and the minimum rather than the average of two Q-heads for the terminal value. <!-- F:M5 --> <!-- F:M6 --> <!-- F:P1 --> <!-- F:P2 -->

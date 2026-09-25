@@ -1,0 +1,16 @@
+## Limitations and future work {#sec-limitations}
+
+- "Reality" is ComFree with 71 perturbed parameters, so the sim-to-real gap SysID closes is purely parametric; there is no real robot. <!-- F:T7 -->
+- SysID uses batched central finite differences, not gradients through the simulator. <!-- F:S1 -->
+- Repetitions are same-seed reruns on a non-deterministic simulator, with n = 3 and 16 episodes per evaluation. <!-- F:C1 -->
+- 3 of 78 runs are degenerate for reasons I did not investigate. <!-- F:R10 -->
+- The planner was still improving at 300k steps, so no configuration is converged. <!-- F:R9 --> <!-- F:R22 -->
+- The drift-ratio diagnostics come from one run per configuration. <!-- F:R14 -->
+- The TD-MPC2 baseline is a single run with different hyperparameters and no terminal masking. <!-- F:B3 -->
+- The learned reward head is trained but never used.  <!-- F:M4 -->
+
+<!-- FALLBACK:sim2sim (once sim2sim results exist: delete this block and re-add the sim2sim include in index.qmd) -->
+**A different contact model.** The obvious next test changes what SysID cannot fix: the contact model. I built an evaluation that runs the trained agents in stock CPU MuJoCo [@todorov2012mujoco] on the same scene, parameters and task code, with only the contact solver changed (parameter parity checked to about 1e-7 relative error). The planner keeps planning through ComFree, synced to the MuJoCo state. Running it on the well-trained runs is the first item of future work. <!-- F:X1 --> <!-- F:X2 --> <!-- F:X3 -->
+<!-- /FALLBACK -->
+
+**Future work.** Move to a real Allegro hand [@allegrohand], where the gap is no longer only parametric. Restrict SysID to the parameters short chunks can observe. Close the policy–planner gap, which none of my interventions did.

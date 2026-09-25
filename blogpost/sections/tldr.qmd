@@ -1,0 +1,18 @@
+## TL;DR
+
+- Planning through the ComFree simulator solves Allegro cube reorientation, but only with a learned terminal Q, which cuts the drop rate from 0.77 to 0.02 and raises goals per episode from 2.56 to 4.72 (n=3 runs). <!-- F:R5 --> By 300k steps: 5.60 ± 0.10 goals (n=3 runs). <!-- F:R9 -->
+<!-- PENDING:baseline -->
+- The comparison with a learned-world-model TD-MPC2 baseline at equal env steps will be added when its run finishes. <!-- F:B4 -->
+<!-- /PENDING -->
+- Online system identification halves the error of ComFree's two contact constants and fixes little else. <!-- F:R11 -->
+- The distilled policy never catches up: ≤ 1.08 goals per episode against 3.7–4.9 for the planner. <!-- F:R13 -->
+
+::: {#fig-hero}
+```{=html}
+<video controls muted playsinline preload="metadata" poster="figures/hero_poster.png" style="width:100%">
+  <source src="videos/hero.mp4" type="video/mp4">
+</video>
+```
+
+The best agent after 300k steps (single run, E configuration): the planner (left) and the policy alone (right), in separate episodes. <!-- F:HERO2 -->
+:::

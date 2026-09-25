@@ -1,0 +1,35 @@
+## Sim2Sim: ComFree → MuJoCo {#sec-sim2sim}
+
+Everything above is measured in "reality", i.e. ComFree with perturbed parameters. Sim2sim changes what SysID cannot fix: the contact model. Trained agents are run in stock CPU MuJoCo [@todorov2012mujoco] with the same scene, timestep, reality parameters and task code; only the contact solver differs. The two ComFree contact constants have no MuJoCo equivalent and are dropped. <!-- F:X1 --> The policy is evaluated alone. The planner still plans through ComFree with the run's identified parameters, synced to the MuJoCo state at every step. <!-- F:X2 --> Parameters match between the simulators to about 1e-7 relative error. <!-- F:X3 --> There is still no real robot.
+
+Questions: does the hero agent keep working? Does the hero configuration transfer better at 300k than at 150k, or does longer training overfit to ComFree? Is TD-MPC2 more or less brittle? Does DAgger's safer policy transfer better than rung D's? How far do open-loop trajectories diverge? I only evaluate runs that trained well (planner G ≥ 4.5, drop ≤ 0.05, plus the DAgger policies). Runs that already drop the cube in ComFree leave no gap to measure.
+
+<!-- PENDING:sim2sim -->
+::: {.callout-note}
+## Sim2sim evaluation in progress
+Results follow once the runs finish.
+:::
+
+| run | mode | n | ComFree G | MuJoCo G | Δ G | ComFree drop | MuJoCo drop |
+|---|---|---|---|---|---|---|---|
+| hero (E, 300k, repetition 2) | planner | 1 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| hero (E, 300k, repetition 2) | policy | 1 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E, 300k | planner | 3 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E, 300k | policy | 3 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E, 150k | planner | 3 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E, 150k | policy | 3 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| D, 150k | policy | 3 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| DAgger β = 0.3 | policy | 3 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| DAgger β = 0.6 | policy | 3 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| TD-MPC2, 150k / 300k / 1M | planner | 1 | PENDING | PENDING | PENDING | PENDING | PENDING |
+| TD-MPC2, 150k / 300k / 1M | policy | 1 | PENDING | PENDING | PENDING | PENDING | PENDING |
+
+: ComFree vs. MuJoCo, 64 episodes per run, default MuJoCo solver. Δ = MuJoCo − ComFree. {#tbl-sim2sim}
+
+![ComFree vs. MuJoCo goals per episode (left) and drop rate (right) for each evaluated run, with bootstrap 95% confidence intervals.](figures/sim2sim.svg){#fig-sim2sim}
+
+<!-- /PENDING -->
+
+<!-- FALLBACK:sim2sim
+The obvious next test is a different contact model. I built an evaluation that runs the trained agents in stock CPU MuJoCo on the same scene, parameters and task code, with only the contact solver changed (parameter parity checked to about 1e-7). The planner keeps planning through ComFree, synced to the MuJoCo state. Running it on the well-trained runs is the first item of future work.
+-->

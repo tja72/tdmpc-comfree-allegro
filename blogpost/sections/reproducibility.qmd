@@ -1,0 +1,16 @@
+## Code and reproducibility {#sec-code}
+
+All code, configs and per-run logs are in one repository [@althaus2026tdmpccomfree]. Conda environments are in `envs/comfree-tdmpc.yml` (agent, SysID, sim2sim) and `envs/tdmpc-baseline.yml` (TD-MPC2 baseline). Key commands:
+
+```bash
+cd comfree_tdmpc
+# rung D, one run
+MUJOCO_GL=egl python scripts/train_vec.py --name d_termq --out_root outputs/ablation \
+    --steps 150000 --distill --sysid --terminal_value
+# the full A–F ladder
+MUJOCO_GL=egl python scripts/run_ablation.py --steps 150000
+# aggregate all runs into the tables of this post
+cd ../blogpost && python scripts/aggregate_results.py
+```
+
+Trained checkpoints are GitHub Release assets. `mujoco==3.6.0` and `warp-lang==1.14.0` are pinned exactly; Warp 1.16 fails at kernel code generation. <!-- F:L3 --> My code is MIT-licensed, but `comfree_core` inside ComFree-Sim is under a noncommercial academic research license, which covers everything built on it. <!-- F:L1 --> Runs used an RTX 4080, RTX 3070 or RTX 4090, so wall-clock times are not comparable across repetitions. <!-- F:H5 -->

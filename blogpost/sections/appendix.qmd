@@ -1,0 +1,96 @@
+## Appendix: detailed ablations {#sec-appendix}
+
+Numbers are tail means (last 3 planner, last 6 policy evaluations), mean ± std over n repetitions. G = goals per episode.
+
+### All configurations {#sec-app-table}
+
+@tbl-app-all lists every configuration I trained, and @fig-policy_gap summarises the policy-gap interventions. Apart from rungs A–C and pure RL, all use rung D's flags. † = contains one degenerate run that drops the cube in every evaluation; shown with and without it.
+<!-- F:R3 F:R4 F:R6 F:R9 F:R10 F:R15 F:R16 F:R17 F:R18 F:R19 F:R2; RM §1–§8 -->
+
+| configuration | steps | n | planner G | planner drop | policy G | policy drop |
+|---|---|---|---|---|---|---|
+| A: base (MPPI + Q/π learning) | 150k | 3 | 1.44 ± 0.29 | 0.73 ± 0.04 | 0.40 ± 0.35 | 0.86 ± 0.15 |
+| B: + distillation | 150k | 3 | 1.80 ± 0.23 | 0.78 ± 0.10 | 0.94 ± 0.17 | 0.80 ± 0.06 |
+| C: + SysID | 150k | 3 | 2.56 ± 0.55 | 0.77 ± 0.13 | 1.08 ± 0.28 | 0.70 ± 0.08 |
+| D: + terminal Q | 150k | 3 | 4.72 ± 0.22 | 0.02 ± 0.00 | 0.77 ± 0.28 | 0.47 ± 0.04 |
+| E: + BC actor | 150k | 3 | 4.91 ± 0.37 | 0.04 ± 0.02 | 0.80 ± 0.14 | 0.26 ± 0.05 |
+| F: + BC to planner mean | 150k | 3 | 4.57 ± 0.28 | 0.03 ± 0.01 | 0.99 ± 0.08 | 0.20 ± 0.02 |
+| D config, pooled (D + net size default) | 150k | 6 | 4.61 ± 0.43 | 0.02 ± 0.02 | 0.65 ± 0.22 | 0.47 ± 0.07 |
+| D † | 300k | 3 | 3.56 ± 3.09 | 0.34 ± 0.57 | 1.07 ± 1.04 | 0.62 ± 0.33 |
+| D, excl. degenerate | 300k | 2 | 5.34 ± 0.07 | 0.01 ± 0.01 | 1.61 ± 0.67 | 0.43 ± 0.06 |
+| E (hero config) | 300k | 3 | 5.60 ± 0.10 | 0.00 ± 0.00 | 1.11 ± 0.25 | 0.20 ± 0.04 |
+| net size small | 150k | 3 | 4.56 ± 0.12 | 0.05 ± 0.02 | 0.39 ± 0.13 | 0.31 ± 0.08 |
+| net size default | 150k | 3 | 4.50 ± 0.61 | 0.03 ± 0.03 | 0.54 ± 0.08 | 0.47 ± 0.10 |
+| net size large | 150k | 3 | 4.30 ± 0.24 | 0.03 ± 0.01 | 0.76 ± 0.20 | 0.44 ± 0.04 |
+| E without Q (pure BC) † | 150k | 3 | 3.17 ± 2.76 | 0.35 ± 0.57 | 0.35 ± 0.30 | 0.48 ± 0.45 |
+| E without Q, excl. degenerate | 150k | 2 | 4.76 ± 0.28 | 0.02 ± 0.03 | 0.52 ± 0.03 | 0.22 ± 0.06 |
+| F without Q (pure BC) | 150k | 3 | 4.44 ± 0.34 | 0.02 ± 0.04 | 0.70 ± 0.13 | 0.27 ± 0.08 |
+| DAgger β = 0 | 150k | 3 | 4.53 ± 0.25 | 0.03 ± 0.03 | 0.62 ± 0.16 | 0.26 ± 0.01 |
+| DAgger β = 0.3 | 150k | 3 | 4.29 ± 0.45 | 0.04 ± 0.04 | 0.69 ± 0.09 | 0.18 ± 0.07 |
+| DAgger β = 0.6 | 150k | 3 | 3.79 ± 0.11 | 0.09 ± 0.06 | 0.89 ± 0.21 | 0.18 ± 0.03 |
+| D, 128 samples in training | 150k | 3 | 4.17 ± 0.15 | 0.02 ± 0.02 | 0.77 ± 0.05 | 0.39 ± 0.06 |
+| DAgger β = 0.3, 128 samples | 150k | 3 | 3.69 ± 0.22 | 0.05 ± 0.05 | 0.88 ± 0.20 | 0.18 ± 0.02 |
+| offline v1, trigger 0.15 | 150k | 3 | 4.66 ± 0.15 | 0.01 ± 0.01 | 0.66 ± 0.23 | 0.52 ± 0.07 |
+| offline v1, trigger 0.1 (pooled) | 150k | 6 | 4.67 ± 0.23 | 0.02 ± 0.02 | 0.78 ± 0.19 | 0.51 ± 0.02 |
+| offline v2: no offline phase † | 60k | 3 | 2.27 ± 2.00 | 0.44 ± 0.49 | 0.33 ± 0.31 | 0.70 ± 0.27 |
+| offline v2: no offline phase, excl. degenerate | 60k | 2 | 3.41 ± 0.52 | 0.17 ± 0.12 | 0.49 ± 0.19 | 0.55 ± 0.09 |
+| offline v2: forced at 20k | 60k | 3 | 3.40 ± 0.35 | 0.17 ± 0.07 | 0.26 ± 0.11 | 0.58 ± 0.07 |
+| offline v2: forced at 45k | 60k | 3 | 3.58 ± 0.08 | 0.11 ± 0.09 | 0.37 ± 0.20 | 0.49 ± 0.04 |
+| offline v2: periodic | 60k | 3 | 3.62 ± 0.18 | 0.06 ± 0.04 | 0.50 ± 0.29 | 0.41 ± 0.04 |
+| pure RL (SAC, no planner) | 150k | 3 | — | — | 0.00 ± 0.00 | 1.00 ± 0.00 |
+
+: Tail performance of every configuration. Rungs A–F are cumulative. {#tbl-app-all}
+
+![Policy-gap interventions: planner and policy tail G (mean ± std, n = 3 unless stated) vs. rung D. The policy moves little and never approaches the planner.](figures/policy_gap.svg){#fig-policy_gap}
+
+### DAgger and the policy–planner gap {#sec-app-dagger}
+
+**Change.** Rung D with the actor cloning the planner's mean action (`bc_mu`), plus DAgger [@ross2011dagger]: with probability β the policy's action is executed, and the planner's action is still the label. β ∈ {0, 0.3, 0.6}, n = 3 each.
+
+**Result.** Policy G rises from 0.62 ± 0.16 (β = 0) to 0.69 ± 0.09 (β = 0.3) and 0.89 ± 0.21 (β = 0.6), against 0.77 ± 0.28 for rung D. <!-- F:R16 --> The planner pays: 4.53 ± 0.25, 4.29 ± 0.45, 3.79 ± 0.11 (D: 4.72 ± 0.22). <!-- F:R16 --> The policy/planner ratio rises from 0.16 (D) to 0.23 at β = 0.6, mostly because the planner gets worse. <!-- F:R16 --> Policy drops fall from 0.47 (D) to 0.26 with `bc_mu` alone and 0.18 with DAgger. <!-- F:R16 -->
+
+**Verdict.** Safer policy; the gain in goals is within the spread, and the gap stays.
+
+### Planning with fewer rollouts {#sec-app-budget}
+
+**Change (evaluation).** DAgger β = 0.3 and rung D checkpoints re-evaluated with fewer MPPI iterations × samples, 32 episodes per cell, n = 3 per arm. <!-- F:R20 -->
+
+**Result.** At full budget (3 × 256): rung D 4.76 ± 0.33, DAgger 4.64 ± 0.52. <!-- F:R20 --> Rung D is at or above DAgger in all 6 cells on the mean; DAgger leads only in repetition 1. <!-- F:R20 --> Both degrade gracefully: for rung D, 3 × 64 keeps ≈ 88% of the goals (4.18 vs 4.76) at half the plan time (@fig-rollout_budget). <!-- F:R20 -->
+
+**Change (training).** Both trained with 128 instead of 256 samples, n = 3. The rung-D planner falls to 4.17 ± 0.15 with an unchanged policy (0.77 ± 0.05); DAgger's planner reaches 3.69 ± 0.22 (policy 0.88 ± 0.20). <!-- F:R20b -->
+
+**Verdict.** DAgger does not buy cheaper planning, at evaluation or in training.
+
+![Rollout budget at evaluation: G vs. ms per plan call (log scale), DAgger β = 0.3 vs. rung D, mean ± std over n = 3; labels = iterations × samples. Faint: repetition 1, which suggested DAgger allows cheaper planning.](figures/rollout_budget.svg){#fig-rollout_budget}
+
+### Does the policy need Q? {#sec-app-noq}
+
+**Change.** Rungs E and F without the Q term in the actor loss: pure behaviour cloning of the planner. Q still trains for the planner.
+
+**Result.** Policy G drops from 0.80 ± 0.14 (E) to 0.52 ± 0.03 (n = 2, one degenerate run excluded) and from 0.99 ± 0.08 (F) to 0.70 ± 0.13 (n = 3). <!-- F:R17 --> The planner is unaffected (4.76 ± 0.28, 4.44 ± 0.34). <!-- F:R17 -->
+
+**Verdict.** Keeping Q in the actor loss gives the better policy.
+
+### Policy network size {#sec-app-netsize}
+
+**Change.** Rung D with MLP and latent width 128 (small), the default (384 and 256), or 512 (large), n = 3 each. <!-- F:M1 --> <!-- F:M9 -->
+
+**Result.** Policy G 0.39 ± 0.13, 0.54 ± 0.08 and 0.76 ± 0.20; the planner is unaffected (4.56, 4.50, 4.30). <!-- F:R15 -->
+
+**Verdict.** Slightly better on the mean, but the repetitions overlap; capacity is not the main limit.
+
+### Offline consolidation phase {#sec-app-offline}
+
+**Change (v1).** Rung D plus one burst of 50k extra gradient updates on the replay buffer, triggered when the SysID held-out loss falls below 0.15 or 0.1 (n = 3 and 6). <!-- F:O1 -->
+
+**Result.** Planner 4.66–4.78, policy 0.66–0.89, vs. 4.61 ± 0.43 and 0.65 ± 0.22 for rung D pooled (n = 6). <!-- F:R18 --> In one run the phase never fired. <!-- F:R18 --> **v2** (60k steps: no phase, forced at 20k or 45k, periodic; n = 3 each): no condition separates, and the periodic trigger fired in 1 of 3 runs. <!-- F:R18 -->
+
+**Verdict.** No clear gain, at 4–5 h instead of about 1 h per run. <!-- F:H4 -->
+
+### Single runs vs repetitions {#sec-app-reps}
+
+DAgger's first run (β = 0.3) gave the best single-run policy, 1.38 G, so I took DAgger to be the fix and built both reduced-rollout experiments on it before repeating it. <!-- F:R23 --> The repetitions came last: 0.50 and 0.69, and DAgger's rollout-budget advantage was the same top draw. <!-- F:R16 F:R20 F:R23 -->
+
+Identical configurations vary a lot: six rung-D runs end between 3.88 and 5.75 planner G. <!-- F:R21 --> Headline numbers in my earlier log (5.63, 5.75, 1.38) are top draws. <!-- F:R21 --> Two more claims were rep-1 artefacts: SysID giving no gain over B (with n = 3, C is above B on the mean, with a large spread) and the terminal Q "more than doubling" the planner (×1.8 vs C). <!-- F:R5 F:R8; RM §13 --> What held: the terminal Q as the largest step, the policy gap, pure RL failing, and SysID fixing only the contact constants.
+
+**Lesson.** An experiment built on a single run inherits its luck. Repetitions cost about an hour each and belong before the follow-ups, not after. <!-- F:H4 -->

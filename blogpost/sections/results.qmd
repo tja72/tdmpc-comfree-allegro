@@ -1,0 +1,81 @@
+## Results {#sec-results}
+
+Numbers are tail means over the last evaluations (@sec-setup), as mean ± std over 3 repetitions unless stated otherwise.
+
+### Finding 1: Planning through ComFree solves the task, but only with a learned terminal value
+
+Neither ingredient works alone. MPPI through the simulator with the true parameters and no learning drops the cube in 84–100% of episodes at every setting I tried (single tuning sweep). <!-- F:R1 --> Model-free SAC [@haarnoja2018sac] with no planner gets 0.00 ± 0.00 goals per episode and drops the cube in every episode after 150k steps. <!-- F:R2 -->
+
+The ablation ladder (@fig-ladder_curves) adds one component per rung. Distillation (A→B) and SysID (B→C) move the planner from 1.44 ± 0.29 to 2.56 ± 0.55 goals per episode, but its drop rate stays at 0.73–0.78. <!-- F:R3 --> <!-- F:R4 --> Adding the terminal Q (C→D) is by far the largest step: the drop rate falls from 0.77 to 0.02 and goals rise ×1.8, from 2.56 to 4.72 ± 0.22. <!-- F:R5 --> The actor variants E and F change little (4.91 ± 0.37, 4.57 ± 0.28). <!-- F:R3 -->
+
+The reason is the horizon. The planner looks 8 control steps ahead, which is 0.16 s at 50 Hz. <!-- F:P1 --> <!-- F:T1 --> A drop only shows up in that window once the cube is already sliding. The terminal $Q$ gives each rollout a value for the state it ends in, so the planner can avoid states from which a drop follows later.
+
+None of the 150k runs had converged. At 300k steps, the E configuration reaches 5.60 ± 0.10 goals per episode with no drops. <!-- F:R9 --> Three of the 78 runs in this project drop every episode from the first evaluation onwards (cause not investigated); I exclude them where noted. <!-- F:R10 -->
+
+![Planner goals per episode (left) and drop rate (right) over training for rungs A–F of the ablation ladder, mean and band over 3 repetitions, evaluated every 25k steps. Rungs D–F have the terminal value $Q$. The dotted line is pure RL (policy only, no planner).](figures/ladder_curves.svg){#fig-ladder_curves}
+
+### Finding 2: Comparison with the learned-world-model baseline (run in progress)
+
+This finding compares against TD-MPC2 with the TD-M(PC)² actor loss [@hansen2024tdmpc2; @lin2025tdmpc2square], which plans in a learned latent model. It runs on the same task code with the same "reality" parameters. <!-- F:B1 --> I compare at **equal environment steps**: the baseline at 150k against the 150k configurations, the baseline at 300k against the 300k runs, and the baseline's full 1M-step run shown on its own, to see whether the learned model gets there eventually. <!-- F:B4 --> @tbl-equal-steps lists the comparison points. The comparison has caveats. The baseline masks no terminal states in its TD targets (drop and timeout are both `done`), it evaluates on a different schedule, its hyperparameters differ, and it is a single run. <!-- F:B3 --> <!-- F:M6 -->
+
+@fig-long_runs already shows the ComFree side. For the hero configuration (E at 300k), the planner goes from 3.75 / 5.25 / 5.19 goals per episode at 150k (runs 1/2/3) to 5.50 / 5.81 / 6.12 at 300k. It is still rising slowly and has not converged. <!-- F:R22 -->
+
+<!-- PENDING:baseline -->
+::: {.callout-note}
+## Baseline run in progress
+
+The TD-MPC2 baseline run is in progress; this comparison will be added when it finishes. Until then, these are open questions, not findings:
+
+- **h1.** At 150k env steps, does the learned-model baseline solve fewer goals per episode than the planner through ComFree? <!-- F:B-hypotheses -->
+- **h2.** Is the wall-clock cost per env step of the same order (roughly 27 env steps/s for the baseline vs 37–47 here, on differently loaded GPUs)? <!-- F:B-hypotheses --> <!-- F:B2 -->
+- **h3.** Is the baseline's gap between policy and planner smaller, because its planner rolls out in the same latent space the policy is trained on? <!-- F:B-hypotheses -->
+
+| budget | agent | n | planner G | planner drop | policy G | policy drop |
+|---|---|---|---|---|---|---|
+| 150k | D (terminal Q) | 3 | 4.72 ± 0.22 | 0.02 | 0.77 ± 0.28 | 0.47 |
+| 150k | E (+ bc actor) | 3 | 4.91 ± 0.37 | 0.04 | 0.80 ± 0.14 | 0.26 |
+| 150k | TD-MPC2 baseline | 1 | — | — | — | — |
+| 300k | D (terminal Q) | 2 | 5.34 ± 0.07 | 0.01 | 1.61 ± 0.67 | 0.43 |
+| 300k | E (hero config) | 3 | 5.60 ± 0.10 | 0.00 | 1.11 ± 0.25 | 0.20 |
+| 300k | TD-MPC2 baseline | 1 | — | — | — | — |
+| 1M | TD-MPC2 baseline | 1 | — | — | — | — |
+
+: Tail goals per episode (G) and drop rates at equal env steps. — = baseline run in progress. The 300k D row excludes one degenerate run. {#tbl-equal-steps}
+
+<!-- F:R3 --> <!-- F:R4 --> <!-- F:R6 --> <!-- F:R9 --> <!-- RM §1, §2 -->
+:::
+<!-- /PENDING -->
+
+![Planner (blue) and policy (orange) goals per episode vs env steps (left) and vs wall-clock hours (right) for the 300k runs: E (n=3, the hero run as a thin line) and D (n=2, one degenerate run excluded). Dotted lines mark the equal-step comparison points at 150k and 300k. The TD-MPC2 baseline curve will be added when its run finishes. Runs used different GPUs.](figures/long_runs.svg){#fig-long_runs}
+
+### Finding 3: SysID identifies the contact model and little else
+
+SysID fits 71 parameters in 5 groups. Only one group clearly moves (@fig-sysid). The error in the two ComFree contact constants roughly halves in every configuration: from 0.183 to 0.081 in rung C and from 0.184 to 0.083 in rung D. <!-- F:R11 --> The 48 joint parameters stay flat (C: 0.085 → 0.082), and the inertial group gets worse (C: 0.085 → 0.118, D: 0.089 → 0.100). <!-- F:R11 --> The mean error over all 71 parameters barely moves (D: 0.096 → 0.087). <!-- F:R11 --> In 60k-step runs it has not moved yet (0.185 → 0.185). <!-- F:R12 -->
+
+Turning SysID on (B→C) raises planner goals from 1.80 ± 0.23 to 2.56 ± 0.55 on the mean, but the spread is large, and the first run alone showed no gain. <!-- F:R8 --> SysID probably helps the planner, but I cannot say by how much.
+
+My interpretation, which I have not tested: SysID fixes what the planner's predictions are most sensitive to, the contact law. Masses and inertias are only weakly observable from 0.1 s replay chunks, so the fit trades them off against other parameters. <!-- F:S4 --> The gap SysID closes here is parametric by construction (@sec-setup). <!-- F:T7 -->
+
+![SysID error $|\hat u - u^\star|$ per parameter group. Left: first vs last SysID call, pooled over rungs C–F at 150k. Right: error of the two ComFree contact constants over training for rungs C and D, mean and band over 3 repetitions.](figures/sysid.svg){#fig-sysid}
+
+### Finding 4: The policy never catches up with the planner
+
+In every 150k configuration, the policy's tail is at most 1.08 goals per episode (means over 3 runs). With the terminal $Q$, the planner reaches 3.7–4.9. On the ladder, the policy/planner ratio is 0.16–0.53 (@fig-planner_vs_policy). <!-- F:R13 --> @fig-planner_vs_policy_video shows a typical case. The gap grows as the planner gets better: the policy's imitation error on its own states, relative to planner states, rises from 1.05 in rung A to 2.04–2.35 in D–F (single run each). <!-- F:R14 -->
+
+None of five levers closes the gap with n=3.
+
+- **DAgger** [@ross2011dagger]: at β = 0.6 the ratio rises from 0.16 to 0.23, mostly because the planner loses goals (4.72 → 3.79). The policy gain is within the spread between runs. <!-- F:R16 --> See @sec-app-dagger.
+- **Fewer rollouts**: at evaluation, rung D is at or above the DAgger checkpoint at every budget, and 3×64 samples keep about 88% of full-budget goals at half the plan time. <!-- F:R20 --> Training with 128 instead of 256 samples costs the planner about 0.55 goals, and DAgger does not recover them. <!-- F:R20b --> See @sec-app-budget.
+- **Does the policy need $Q$?** Yes. Pure behaviour cloning of the planner gives fewer goals than keeping the $Q$ term (0.70 ± 0.13 vs 0.99 ± 0.08 for the F actor). <!-- F:R17 --> See @sec-app-noq.
+- **Network size**: larger policies do slightly better (0.39 → 0.54 → 0.76), but the runs overlap. <!-- F:R15 --> See @sec-app-netsize.
+- **Offline consolidation**: no clear gain over the same configuration without it. <!-- F:R18 --> See @sec-app-offline.
+
+The repetitions contradict two earlier single-run claims. DAgger's policy result of 1.38 goals (β = 0.3, final evaluation) came from the best of three runs. The other two reached 0.50 and 0.69, and the tail mean is 0.69 ± 0.09. The claim that SysID gives no gain held only for the first run. <!-- F:R16 --> <!-- F:R8 --> <!-- F:R21 --> Because DAgger's first run looked best, I built the reduced-rollout experiments on it. Only the repetitions, run last, showed it was a top draw. <!-- F:R23 --> The lesson: repeat a result before building on it (@sec-app-reps).
+
+![Planner (blue) and policy (orange) tail goals per episode per ladder rung at 150k and for E at 300k, error bars = std over 3 repetitions. Drift = policy imitation error on its own states divided by that on planner states (single run per rung). The TD-MPC2 bar will be added when its run finishes.](figures/planner_vs_policy.svg){#fig-planner_vs_policy}
+
+::: {#fig-planner_vs_policy_video}
+{{< video videos/planner_vs_policy.mp4 >}}
+
+Rung D after 150k steps (single run): the planner reaches 4 goals, while the policy alone reaches none.
+:::

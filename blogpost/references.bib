@@ -1,0 +1,203 @@
+% references.bib -- course blog post "TD-M(PC)^2 with ComFree-Sim as planner dynamics"
+% Every entry was checked on the web on 2026-09-25; the URL used is in the
+% comment line above each entry.
+
+% ---------------------------------------------------------------------------
+% TD-MPC family
+% ---------------------------------------------------------------------------
+
+% Verified: https://arxiv.org/abs/2310.16828 (comments: "ICLR 2024"; license CC BY 4.0)
+@inproceedings{hansen2024tdmpc2,
+  title         = {{TD-MPC2}: Scalable, Robust World Models for Continuous Control},
+  author        = {Hansen, Nicklas and Su, Hao and Wang, Xiaolong},
+  booktitle     = {International Conference on Learning Representations (ICLR)},
+  year          = {2024},
+  eprint        = {2310.16828},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+  url           = {https://arxiv.org/abs/2310.16828}
+}
+
+% Verified: https://proceedings.mlr.press/v162/hansen22a.html  (arXiv: https://arxiv.org/abs/2203.04955)
+% Note: PMLR author order is Hansen, Su, Wang; the arXiv page lists Hansen, Wang, Su. PMLR order used.
+@inproceedings{hansen2022tdmpc,
+  title         = {Temporal Difference Learning for Model Predictive Control},
+  author        = {Hansen, Nicklas and Su, Hao and Wang, Xiaolong},
+  booktitle     = {Proceedings of the 39th International Conference on Machine Learning (ICML)},
+  series        = {Proceedings of Machine Learning Research},
+  volume        = {162},
+  pages         = {8387--8406},
+  publisher     = {PMLR},
+  year          = {2022},
+  eprint        = {2203.04955},
+  archivePrefix = {arXiv},
+  url           = {https://proceedings.mlr.press/v162/hansen22a.html}
+}
+
+% Verified: https://arxiv.org/abs/2502.03550 (v1 2025-02-05; license CC BY 4.0; no venue on arXiv)
+% Venue: https://darthutopian.github.io/tdmpc_square/ states "L4DC 2026"; the authors' own BibTeX
+% there is still the arXiv @article. L4DC 2026 proceedings (PMLR volume/pages) not checked -> cited
+% as arXiv preprint with the acceptance in `note`.
+@misc{lin2025tdmpc2square,
+  title         = {{TD-M(PC)²}: Improving Temporal Difference {MPC} Through Policy Constraint},
+  author        = {Lin, Haotian and Wang, Pengcheng and Schneider, Jeff and Shi, Guanya},
+  year          = {2025},
+  eprint        = {2502.03550},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+  note          = {Accepted to Learning for Dynamics and Control (L4DC) 2026},
+  url           = {https://arxiv.org/abs/2502.03550}
+}
+
+% ---------------------------------------------------------------------------
+% Contact models / simulators
+% ---------------------------------------------------------------------------
+
+% Verified: https://arxiv.org/abs/2603.12185 (v1 2026-03-12, v2 2026-03-14; license CC BY 4.0; no venue)
+% and the authors' BibTeX in the README of https://github.com/asu-iris/comfree_warp
+@misc{borse2026comfree,
+  title         = {{ComFree-Sim}: A {GPU}-Parallelized Analytical Contact Physics Engine for Scalable Contact-Rich Robotics Simulation and Control},
+  author        = {Borse, Chetan and Xie, Zhixian and Huang, Wei-Cheng and Jin, Wanxin},
+  year          = {2026},
+  eprint        = {2603.12185},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url           = {https://arxiv.org/abs/2603.12185}
+}
+
+% Verified: https://github.com/asu-iris/comfree_warp (public; "A GPU-Parallel analytical physics engine
+% with mujoco API compatibility"; comfree_core/ is under a noncommercial academic research license,
+% vendored mujoco_warp under Apache-2.0). NB: github.com/google/comfree is a 404 -- do not cite it.
+@software{comfreewarp2026code,
+  title        = {{comfree\_warp}: {ComFree-Sim}, a {GPU}-Parallel Analytical Physics Engine with {MuJoCo} {API} Compatibility},
+  author       = {Borse, Chetan and Xie, Zhixian and Huang, Wei-Cheng and Jin, Wanxin},
+  organization = {ASU IRIS Lab},
+  year         = {2026},
+  url          = {https://github.com/asu-iris/comfree_warp},
+  note         = {Software; comfree\_core is licensed for noncommercial academic research only}
+}
+
+% Verified: https://arxiv.org/abs/2408.07855 (v4 2025-04-22, comment "Accepted to RSS 2025";
+% license arXiv non-exclusive) and Crossref DOI 10.15607/RSS.2025.XXI.111 (Robotics: Science and Systems XXI)
+@inproceedings{jin2025comfree,
+  title         = {Complementarity-Free Multi-Contact Modeling and Optimization for Dexterous Manipulation},
+  author        = {Jin, Wanxin},
+  booktitle     = {Robotics: Science and Systems XXI (RSS)},
+  year          = {2025},
+  doi           = {10.15607/RSS.2025.XXI.111},
+  eprint        = {2408.07855},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url           = {https://arxiv.org/abs/2408.07855}
+}
+
+% Verified: citation block in README of https://github.com/google-deepmind/mujoco
+% and Crossref record for DOI 10.1109/IROS.2012.6386109
+@inproceedings{todorov2012mujoco,
+  title        = {{MuJoCo}: A physics engine for model-based control},
+  author       = {Todorov, Emanuel and Erez, Tom and Tassa, Yuval},
+  booktitle    = {2012 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  pages        = {5026--5033},
+  year         = {2012},
+  organization = {IEEE},
+  doi          = {10.1109/IROS.2012.6386109}
+}
+
+% Verified: https://github.com/google-deepmind/mujoco_warp (Apache-2.0; no CITATION.cff -> 404; no
+% citation section in README) and https://mujoco.readthedocs.io/en/stable/mjwarp/ .
+% No MJWarp paper exists as of 2026-09-25; this follows how the ComFree-Sim paper (arXiv:2603.12185,
+% references) cites it: "Google DeepMind and NVIDIA. MuJoCo Warp (MJWarp)" + docs URL.
+% MJX has no separate paper either; the MuJoCo docs present it as a MuJoCo backend -> cite
+% todorov2012mujoco + the docs if MJX is mentioned.
+@software{mujocowarp,
+  title        = {{MuJoCo Warp (MJWarp)}: {GPU}-Accelerated {MuJoCo} for {NVIDIA} Hardware},
+  author       = {{Google DeepMind} and {NVIDIA}},
+  year         = {2025},
+  url          = {https://github.com/google-deepmind/mujoco_warp},
+  note         = {Documentation: \url{https://mujoco.readthedocs.io/en/stable/mjwarp/}}
+}
+
+% Verified: https://raw.githubusercontent.com/NVIDIA/warp/main/CITATION.cff (preferred-citation:
+% Macklin, 2022-03, "NVIDIA GPU Technology Conference (GTC)"), linked from README of https://github.com/NVIDIA/warp
+@misc{macklin2022warp,
+  title        = {Warp: A High-performance {Python} Framework for {GPU} Simulation and Graphics},
+  author       = {Macklin, Miles},
+  year         = {2022},
+  month        = mar,
+  howpublished = {NVIDIA GPU Technology Conference (GTC)},
+  url          = {https://github.com/NVIDIA/warp}
+}
+
+% ---------------------------------------------------------------------------
+% Planning / learning algorithms
+% ---------------------------------------------------------------------------
+
+% Verified: Crossref record for DOI 10.1109/ICRA.2017.7989202 (authors, pages 1714-1721)
+% Canonical "information-theoretic MPC" / MPPI-with-learned-models paper.
+@inproceedings{williams2017mppi,
+  title     = {Information theoretic {MPC} for model-based reinforcement learning},
+  author    = {Williams, Grady and Wagener, Nolan and Goldfain, Brian and Drews, Paul and Rehg, James M. and Boots, Byron and Theodorou, Evangelos A.},
+  booktitle = {2017 IEEE International Conference on Robotics and Automation (ICRA)},
+  pages     = {1714--1721},
+  year      = {2017},
+  doi       = {10.1109/ICRA.2017.7989202}
+}
+
+% Verified: Crossref record for DOI 10.1109/ICRA.2016.7487277 (authors, pages 1433-1440)
+@inproceedings{williams2016aggressive,
+  title     = {Aggressive driving with model predictive path integral control},
+  author    = {Williams, Grady and Drews, Paul and Goldfain, Brian and Rehg, James M. and Theodorou, Evangelos A.},
+  booktitle = {2016 IEEE International Conference on Robotics and Automation (ICRA)},
+  pages     = {1433--1440},
+  year      = {2016},
+  doi       = {10.1109/ICRA.2016.7487277}
+}
+
+% Verified: https://proceedings.mlr.press/v80/haarnoja18b.html
+@inproceedings{haarnoja2018sac,
+  title     = {Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor},
+  author    = {Haarnoja, Tuomas and Zhou, Aurick and Abbeel, Pieter and Levine, Sergey},
+  booktitle = {Proceedings of the 35th International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {80},
+  pages     = {1861--1870},
+  publisher = {PMLR},
+  year      = {2018},
+  url       = {https://proceedings.mlr.press/v80/haarnoja18b.html}
+}
+
+% Verified: https://proceedings.mlr.press/v15/ross11a.html
+@inproceedings{ross2011dagger,
+  title     = {A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning},
+  author    = {Ross, St{\'e}phane and Gordon, Geoffrey and Bagnell, Drew},
+  booktitle = {Proceedings of the Fourteenth International Conference on Artificial Intelligence and Statistics (AISTATS)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {15},
+  pages     = {627--635},
+  publisher = {PMLR},
+  year      = {2011},
+  url       = {https://proceedings.mlr.press/v15/ross11a.html}
+}
+
+% ---------------------------------------------------------------------------
+% Hardware / own code
+% ---------------------------------------------------------------------------
+
+% Verified: https://www.allegrohand.com/ (official Wonik Robotics product site; lists Allegro Hand V4, V5,
+% V5 Plus, V5 Sense, V6 F). The simulated model is the MuJoCo Allegro scene shipped with comfree_warp.
+@misc{allegrohand,
+  title        = {{Allegro Hand}},
+  author       = {{Wonik Robotics}},
+  howpublished = {Product page},
+  url          = {https://www.allegrohand.com/},
+  note         = {Accessed 2026-09-25}
+}
+
+% Verified: https://github.com/tja72/tdmpc-comfree-allegro (public, owner tja72)
+@misc{althaus2026tdmpccomfree,
+  title        = {{tdmpc-comfree-allegro}: {TD-M(PC)²} with a {ComFree-Sim} Planner for {Allegro}-Hand Cube Reorientation},
+  author       = {Althaus, Tim},
+  year         = {2026},
+  howpublished = {GitHub repository},
+  url          = {https://github.com/tja72/tdmpc-comfree-allegro}
+}
