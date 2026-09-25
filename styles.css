@@ -1,0 +1,4 @@
+/* Wide result tables scroll horizontally on phones instead of overflowing the page. */
+@media (max-width: 767.98px) {
+  main table { display: block; overflow-x: auto; white-space: nowrap; }
+}

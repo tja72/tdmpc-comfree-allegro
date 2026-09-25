@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tim Althaus">
+<meta name="dcterms.date" content="2026-09-28">
+
+<title>Planning Through a Simulator</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b85bc7c33db8c58e0ec93c3465666fed.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-39f3719cb69d197ba1487197628c936b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-955bea6bf78ce4c7cb6db9c7c0c8d37c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-39f3719cb69d197ba1487197628c936b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-contrib/videojs/video.min.js"></script>
+<link href="site_libs/quarto-contrib/videojs/video-js.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#tldr" id="toc-tldr" class="nav-link active" data-scroll-target="#tldr">TL;DR</a></li>
+  <li><a href="#sec-intro" id="toc-sec-intro" class="nav-link" data-scroll-target="#sec-intro">Introduction</a></li>
+  <li><a href="#sec-background" id="toc-sec-background" class="nav-link" data-scroll-target="#sec-background">Background</a></li>
+  <li><a href="#sec-method" id="toc-sec-method" class="nav-link" data-scroll-target="#sec-method">Method</a></li>
+  <li><a href="#sec-setup" id="toc-sec-setup" class="nav-link" data-scroll-target="#sec-setup">Experimental setup</a></li>
+  <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results">Results</a></li>
+  <li><a href="#sec-limitations" id="toc-sec-limitations" class="nav-link" data-scroll-target="#sec-limitations">Limitations and future work</a></li>
+  <li><a href="#sec-conclusion" id="toc-sec-conclusion" class="nav-link" data-scroll-target="#sec-conclusion">Conclusion</a></li>
+  <li><a href="#sec-code" id="toc-sec-code" class="nav-link" data-scroll-target="#sec-code">Code and reproducibility</a></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements">Acknowledgements</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#sec-appendix" id="toc-sec-appendix" class="nav-link" data-scroll-target="#sec-appendix">Appendix: detailed ablations</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Planning Through a Simulator</h1>
+<p class="subtitle lead">TD-M(PC)² with ComFree-Sim as the world model, for in-hand cube reorientation</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tim Althaus </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 28, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="tldr" class="level2">
+<h2 class="anchored" data-anchor-id="tldr">TL;DR</h2>
+<ul>
+<li>Planning through the ComFree simulator solves Allegro cube reorientation, but only with a learned terminal Q, which cuts the drop rate from 0.77 to 0.02 and raises goals per episode from 2.56 to 4.72 (n=3 runs). By 300k steps: 5.60 ± 0.10 goals (n=3 runs). </li>
+<li>The comparison with a learned-world-model TD-MPC2 baseline at equal env steps will be added when its run finishes. </li>
+<li>Online system identification halves the error of ComFree’s two contact constants and fixes little else. </li>
+<li>The distilled policy never catches up: ≤ 1.08 goals per episode against 3.7–4.9 for the planner. </li>
+</ul>
+<div id="fig-hero" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hero-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<video controls="" muted="" playsinline="" preload="metadata" poster="figures/hero_poster.png" style="width:100%">
+  <source src="videos/hero.mp4" type="video/mp4">
+</video>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hero-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The best agent after 300k steps (single run, E configuration): the planner (left) and the policy alone (right), in separate episodes.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-intro" class="level2">
+<h2 class="anchored" data-anchor-id="sec-intro">Introduction</h2>
+<p>TD-MPC2 <span class="citation" data-cites="hansen2024tdmpc2">(<a href="#ref-hansen2024tdmpc2" role="doc-biblioref">Hansen et al. 2024</a>)</span> and its successor TD-M(PC)² <span class="citation" data-cites="lin2025tdmpc2square">(<a href="#ref-lin2025tdmpc2square" role="doc-biblioref">Lin et al. 2025</a>)</span> learn a latent world model from their own data and plan with it. For contact-rich dexterous manipulation that model is hard to learn: contacts make and break, errors compound over a rollout, and the agent rediscovers physics that is already known. A GPU simulator provides that physics and runs thousands of copies in parallel, but rigid contact makes its rollouts non-smooth in actions and parameters, and its parameters never match the real system exactly. ComFree-Sim <span class="citation" data-cites="borse2026comfree">(<a href="#ref-borse2026comfree" role="doc-biblioref">Borse et al. 2026a</a>)</span> has a smooth, analytical contact model, which helps both planning and fitting parameters from data.</p>
+<p>In this post I replace TD-M(PC)²’s learned world model with ComFree-Sim and learn only the value, the policy and the simulator’s physical parameters. The task is in-hand cube reorientation with a simulated Allegro hand. “Reality” is the same simulator with 71 perturbed parameters, so the gap to be closed is purely parametric, and there is no real robot (<a href="#sec-setup" class="quarto-xref">Section&nbsp;5</a>). <a href="#fig-hero" class="quarto-xref">Figure&nbsp;1</a> shows the best agent. I ask four questions:</p>
+<ol type="1">
+<li>Can a simulator replace the learned model inside TD-M(PC)²?</li>
+<li>What still has to be learned?</li>
+<li>How does it compare with the learned-model original? (Run in progress.)</li>
+<li>What does online parameter identification buy?</li>
+</ol>
+<p>My contributions:</p>
+<ul>
+<li>An agent that plans with MPPI through a bank of 4096 ComFree worlds, adds a learned terminal Q and identifies 71 simulator parameters online (<a href="#sec-method" class="quarto-xref">Section&nbsp;4</a>). </li>
+<li>An ablation over 3 repetitions per configuration that isolates the terminal value as the largest lever (<a href="#sec-results" class="quarto-xref">Section&nbsp;6</a>). </li>
+<li>Negative results on distilling the planner into a policy: none of the fixes I tried closes the gap.</li>
+</ul>
+</section>
+<section id="sec-background" class="level2">
+<h2 class="anchored" data-anchor-id="sec-background">Background</h2>
+<p><strong>TD-MPC2 and TD-M(PC)².</strong> TD-MPC2 <span class="citation" data-cites="hansen2024tdmpc2">(<a href="#ref-hansen2024tdmpc2" role="doc-biblioref">Hansen et al. 2024</a>)</span> learns an encoder, latent dynamics, a reward head, an ensemble of Q-functions and a policy <span class="math inline">\pi</span>, all in one latent space. It plans by rolling sampled action sequences, some from <span class="math inline">\pi</span>, out in the latent model and scoring them by predicted rewards plus a terminal <span class="math inline">Q</span>. The policy is trained SAC-style <span class="citation" data-cites="haarnoja2018sac">(<a href="#ref-haarnoja2018sac" role="doc-biblioref">Haarnoja et al. 2018</a>)</span> to maximise <span class="math inline">Q</span>. Since the planner, not <span class="math inline">\pi</span>, picks the executed actions, <span class="math inline">Q</span> is learned from off-policy data and can overestimate the value of <span class="math inline">\pi</span>’s actions. TD-M(PC)² <span class="citation" data-cites="lin2025tdmpc2square">(<a href="#ref-lin2025tdmpc2square" role="doc-biblioref">Lin et al. 2025</a>)</span> adds a policy-prior term to the actor loss, the log-likelihood of the planner’s actions under <span class="math inline">\pi</span>, which keeps the policy close to the planner’s action distribution. </p>
+<p><strong>MPPI</strong> <span class="citation" data-cites="williams2017mppi">(<a href="#ref-williams2017mppi" role="doc-biblioref">Williams et al. 2017</a>)</span> keeps a Gaussian over action sequences of length <span class="math inline">H</span>. Each iteration samples candidates <span class="math inline">a^{(k)}</span>, computes their scores <span class="math inline">V_k</span> with the model and refits the Gaussian to the elite set <span class="math inline">\mathcal E</span> with exponential weights at temperature <span class="math inline">\lambda</span>:</p>
+<p><span class="math display">
+w_k=\frac{\exp\big(\lambda(V_k-\max_j V_j)\big)}{\sum_{k'\in\mathcal E}\exp\big(\lambda(V_{k'}-\max_j V_j)\big)},\quad
+\mu_t=\sum_{k\in\mathcal E} w_k\, a^{(k)}_t,\quad
+\sigma_t=\sqrt{\textstyle\sum_{k\in\mathcal E} w_k \big(a^{(k)}_t-\mu_t\big)^2}.
+</span></p>
+<p>After the last iteration the first action is executed, and the shifted mean warm-starts the next step.</p>
+<p><strong>ComFree-Sim.</strong> ComFree-Sim <span class="citation" data-cites="borse2026comfree comfreewarp2026code">(<a href="#ref-borse2026comfree" role="doc-biblioref">Borse et al. 2026a</a>, <a href="#ref-comfreewarp2026code" role="doc-biblioref">2026b</a>)</span> implements the complementarity-free contact model of <span class="citation" data-cites="jin2025comfree">Jin (<a href="#ref-jin2025comfree" role="doc-biblioref">2025</a>)</span>: contact forces are computed analytically, with a stiffness and a damping constant, instead of by solving a complementarity problem. The dynamics are smooth in state, actions and parameters. It is built on MuJoCo-Warp <span class="citation" data-cites="mujocowarp">(<a href="#ref-mujocowarp" role="doc-biblioref">Google DeepMind and NVIDIA 2025</a>)</span>, the GPU version of MuJoCo <span class="citation" data-cites="todorov2012mujoco">(<a href="#ref-todorov2012mujoco" role="doc-biblioref">Todorov et al. 2012</a>)</span> written in NVIDIA Warp <span class="citation" data-cites="macklin2022warp">(<a href="#ref-macklin2022warp" role="doc-biblioref">Macklin 2022</a>)</span>. Every world in a batch can carry its own parameters. I use this for the planner’s bank of 4096 worlds and for the batch of 528 finite-difference probe worlds in system identification. <a href="#sec-method" class="quarto-xref">Section&nbsp;4</a> computes <span class="math inline">V</span> with ComFree rollouts at the identified parameters <span class="math inline">\hat u</span> instead of latent rollouts.</p>
+</section>
+<section id="sec-method" class="level2">
+<h2 class="anchored" data-anchor-id="sec-method">Method</h2>
+<div id="fig-architecture" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-architecture-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/architecture.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-architecture-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: What is learned (orange) and what is given (blue). Transitions from “reality” feed two learners: SysID fits the simulator parameters <span class="math inline">\hat u</span>, and TD learning fits <span class="math inline">Q</span> and <span class="math inline">\pi</span>. The planner rolls out 4096 ComFree worlds at <span class="math inline">\hat u</span> and scores them with the analytic task reward plus the terminal <span class="math inline">Q</span>.
+</figcaption>
+</figure>
+</div>
+<p><strong>Learned vs given.</strong> The agent keeps TD-M(PC)²’s value and policy learning but drops its world model (<a href="#fig-architecture" class="quarto-xref">Figure&nbsp;2</a>). It learns an encoder, an ensemble of 5 Q-heads and a squashed-Gaussian policy <span class="math inline">\pi</span>. The dynamics are given by ComFree rollouts at the current estimate <span class="math inline">\hat u</span>, and the reward is the same analytic function that scores “reality”. There is no latent dynamics model and no consistency loss. The encoder only featurises observations for <span class="math inline">Q</span> and <span class="math inline">\pi</span> and is trained through the value loss. </p>
+<p><strong>Planning through 4096 worlds.</strong> The planner is MPPI with horizon <span class="math inline">H=8</span>, 3 iterations and 256 samples per environment, 24 of them drawn from <span class="math inline">\pi</span>. The samples of all 16 environments share one bank of 4096 ComFree worlds, so each rollout costs 8 batched control steps. Each sequence gets the score</p>
+<p><span class="math display">
+V(\tau)=\sum_{t=0}^{H-1}\gamma^{t}\,m_t\,r(s_t,a_t,s_{t+1})\;+\;\gamma^{H}\,m_H\,\min\!\big(Q_i,Q_j\big)\!\big(z_H,\tilde a_H\big),\qquad s_{t+1}=f_{\text{ComFree}}(s_t,a_t;\hat u),
+</span></p>
+<p>where the mask <span class="math inline">m_t</span> becomes 0 after a drop (the drop penalty still counts), <span class="math inline">z_H</span> is the encoded final state, <span class="math inline">\tilde a_H\sim\pi(\cdot\mid z_H)</span>, <span class="math inline">\gamma=0.95</span>, and <span class="math inline">Q_i,Q_j</span> are two random heads. The terminal term switches on after 20k env steps. Weights and updates follow the MPPI rule in <a href="#sec-background" class="quarto-xref">Section&nbsp;3</a>. In evaluation the agent executes the first action of the weighted elite mean; in training it samples one elite by weight and adds the planner’s first-step noise, as in TD-MPC2. The next call warm-starts from the shifted mean. With elite harvesting, the top-8 elites of the last iteration are stored as extra transitions, and training batches mix them 50/50 with real data. </p>
+<p><strong>System identification.</strong> SysID estimates 71 parameters in five groups (<a href="#tbl-params" class="quarto-xref">Table&nbsp;1</a>). Each parameter is mapped to <span class="math inline">[0,1]</span> (log-uniformly for scale factors). </p>
+<div id="tbl-params" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-params-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: The 71 identified parameters. “×” ranges scale the nominal value; the others are additive (nominal 0).
+</figcaption>
+<div aria-describedby="tbl-params-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>group</th>
+<th>n</th>
+<th>parameters</th>
+<th>range</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>joint</td>
+<td>48</td>
+<td>damping, armature, friction loss per DoF</td>
+<td>×0.3–3 (damping); 0–2e-3; 0–1e-2</td>
+</tr>
+<tr class="even">
+<td>actuator</td>
+<td>8</td>
+<td>position gains <span class="math inline">k_p</span>, <span class="math inline">k_v</span>, shared across fingers</td>
+<td>×0.5–2</td>
+</tr>
+<tr class="odd">
+<td>contact</td>
+<td>7</td>
+<td>sliding friction per geom group, cube sliding and torsional friction</td>
+<td>×0.3–3</td>
+</tr>
+<tr class="even">
+<td>inertial</td>
+<td>6</td>
+<td>finger masses, cube mass, cube inertia</td>
+<td>×0.7–1.4; ×0.4–2.5; ×0.5–2</td>
+</tr>
+<tr class="odd">
+<td>comfree</td>
+<td>2</td>
+<td>ComFree contact stiffness and damping</td>
+<td>×0.3–3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The loss replays <span class="math inline">M=16</span> chunks of <span class="math inline">L=5</span> real control steps (0.1 s) open-loop from their recorded states and actions:</p>
+<p><span class="math display">
+\mathcal L(u)=\frac1M\sum_{m=1}^{M}\log\!\Big(1+\frac1L\sum_{t=1}^{L}\min\big(e_{m,t}(u),10^3\big)\Big),\quad
+e=w_q\|\Delta q^{\text{hand}}\|^2+w_p\|\Delta p^{\text{cube}}\|^2+w_\theta\,\Delta\theta_{\text{cube}}^2+w_v\|\Delta\dot q\|^2 ,
+</span></p>
+<p>with weights 1, 20, 1 and 0.02 on hand joints, cube position, cube orientation angle and velocities. SysID does <strong>not</strong> differentiate through the simulator. It uses batched central finite differences along <span class="math inline">K=16</span> random unit directions <span class="math inline">d_k</span>: </p>
+<p><span class="math display">
+\hat g=\frac{P}{K}\sum_{k=1}^{K}\frac{\mathcal L(\Pi(u+\varepsilon d_k))-\mathcal L(\Pi(u-\varepsilon d_k))}{2\varepsilon}\,d_k ,
+</span></p>
+<p>with <span class="math inline">\varepsilon=0.02</span>, <span class="math inline">P=71</span> and <span class="math inline">\Pi</span> the clip to <span class="math inline">[0,1]^{71}</span>. All probes run as one batch of 528 worlds. Finite differences work because ComFree’s contact law is smooth: the loss varies gradually with <span class="math inline">u</span>, whereas with hard contact a small perturbation can switch contacts on or off. Each call takes 30 normalised-momentum steps and keeps the iterate with the lowest held-out loss. SysID runs every 5k env steps, takes about 2 s, and writes <span class="math inline">\hat u</span> into all planner worlds. </p>
+<p><strong>Parallelisation.</strong> One ComFree world costs 2.65 ms per control step. The planner’s 4096 worlds cost 22.8 ms, which is 1.80M physics steps/s (<a href="#fig-throughput" class="quarto-xref">Figure&nbsp;3</a>). In a benchmark plan call over 256 worlds, the networks take only 4.4 ms of 331 ms. Planning 16 environments together gives 4.19× the env-step rate of one. </p>
+<div id="fig-throughput" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-throughput-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/throughput.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-throughput-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Simulation cost vs number of parallel ComFree worlds: time per control step for the whole batch (left) and physics steps per second (right). The dotted line marks the planner’s bank. Single benchmark run; the machine was not recorded.
+</figcaption>
+</figure>
+</div>
+<p><strong>Deviations from TD-M(PC)².</strong> I also use a fixed discount, 1-step TD targets in which only a drop is terminal, smaller networks (width 384, latent 256), value weight 1.0 instead of 0.1, prior weight 0.5 instead of 1.0, coloured sampling noise, and the minimum rather than the average of two Q-heads for the terminal value. </p>
+</section>
+<section id="sec-setup" class="level2">
+<h2 class="anchored" data-anchor-id="sec-setup">Experimental setup</h2>
+<p><strong>Task.</strong> A simulated 16-DoF Allegro hand <span class="citation" data-cites="allegrohand">(<a href="#ref-allegrohand" role="doc-biblioref">Wonik Robotics, n.d.</a>)</span> sets joint position targets at 50 Hz to rotate a cube to a goal: the start orientation yawed by <span class="math inline">\pm\,\mathcal U(0.6,\pi)</span> rad. After 10 consecutive steps within 0.4 rad a new goal is drawn, so goals per episode (G) is a rate. Episodes last 120 steps (2.4 s); a drop ends them with −50. </p>
+<p><strong>“Reality”.</strong> There is no real robot. “Reality” is the same ComFree simulator with its 71 parameters perturbed once,</p>
+<p><span class="math display">
+u^\star=\Pi\big(u^{\text{nom}}+\delta\big),\qquad \delta\sim\mathcal U(-0.25,\,0.25)^{71},
+</span></p>
+<p>redrawn until the hand holds the cube stably. The planner starts from <span class="math inline">\hat u=u^{\text{nom}}</span>, so the gap is purely parametric. </p>
+<p><strong>Protocol.</strong> 16 environments step in lockstep for 150k env steps. Two configurations were also run to 300k. The policy is evaluated every 5k steps, the planner every 25k (16 episodes each). Metrics are G and drop rate as tail means (last 3 planner or 6 policy evaluations), ± std over 3 repetitions unless noted: same-seed reruns on a nondeterministic GPU simulator. </p>
+<p><strong>Baselines.</strong> Pure RL is the same actor-critic without a planner <span class="citation" data-cites="haarnoja2018sac">(<a href="#ref-haarnoja2018sac" role="doc-biblioref">Haarnoja et al. 2018</a>)</span>; planner-only is MPPI at the true parameters without learning. The learned-model baseline is TD-MPC2 with the TD-M(PC)² actor loss <span class="citation" data-cites="hansen2024tdmpc2 lin2025tdmpc2square">(<a href="#ref-hansen2024tdmpc2" role="doc-biblioref">Hansen et al. 2024</a>; <a href="#ref-lin2025tdmpc2square" role="doc-biblioref">Lin et al. 2025</a>)</span>, run for 1M steps on the same task code and “reality”. Its results are pending. Caveats: one run, timeouts count as terminal, different evaluation cadence and hyperparameters. </p>
+</section>
+<section id="sec-results" class="level2">
+<h2 class="anchored" data-anchor-id="sec-results">Results</h2>
+<p>Numbers are tail means over the last evaluations (<a href="#sec-setup" class="quarto-xref">Section&nbsp;5</a>), as mean ± std over 3 repetitions unless stated otherwise.</p>
+<section id="finding-1-planning-through-comfree-solves-the-task-but-only-with-a-learned-terminal-value" class="level3">
+<h3 class="anchored" data-anchor-id="finding-1-planning-through-comfree-solves-the-task-but-only-with-a-learned-terminal-value">Finding 1: Planning through ComFree solves the task, but only with a learned terminal value</h3>
+<p>Neither ingredient works alone. MPPI through the simulator with the true parameters and no learning drops the cube in 84–100% of episodes at every setting I tried (single tuning sweep). Model-free SAC <span class="citation" data-cites="haarnoja2018sac">(<a href="#ref-haarnoja2018sac" role="doc-biblioref">Haarnoja et al. 2018</a>)</span> with no planner gets 0.00 ± 0.00 goals per episode and drops the cube in every episode after 150k steps. </p>
+<p>The ablation ladder (<a href="#fig-ladder_curves" class="quarto-xref">Figure&nbsp;4</a>) adds one component per rung. Distillation (A→B) and SysID (B→C) move the planner from 1.44 ± 0.29 to 2.56 ± 0.55 goals per episode, but its drop rate stays at 0.73–0.78. Adding the terminal Q (C→D) is by far the largest step: the drop rate falls from 0.77 to 0.02 and goals rise ×1.8, from 2.56 to 4.72 ± 0.22. The actor variants E and F change little (4.91 ± 0.37, 4.57 ± 0.28). </p>
+<p>The reason is the horizon. The planner looks 8 control steps ahead, which is 0.16 s at 50 Hz. A drop only shows up in that window once the cube is already sliding. The terminal <span class="math inline">Q</span> gives each rollout a value for the state it ends in, so the planner can avoid states from which a drop follows later.</p>
+<p>None of the 150k runs had converged. At 300k steps, the E configuration reaches 5.60 ± 0.10 goals per episode with no drops. Three of the 78 runs in this project drop every episode from the first evaluation onwards (cause not investigated); I exclude them where noted. </p>
+<div id="fig-ladder_curves" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ladder_curves-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/ladder_curves.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ladder_curves-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Planner goals per episode (left) and drop rate (right) over training for rungs A–F of the ablation ladder, mean and band over 3 repetitions, evaluated every 25k steps. Rungs D–F have the terminal value <span class="math inline">Q</span>. The dotted line is pure RL (policy only, no planner).
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="finding-2-comparison-with-the-learned-world-model-baseline-run-in-progress" class="level3">
+<h3 class="anchored" data-anchor-id="finding-2-comparison-with-the-learned-world-model-baseline-run-in-progress">Finding 2: Comparison with the learned-world-model baseline (run in progress)</h3>
+<p>This finding compares against TD-MPC2 with the TD-M(PC)² actor loss <span class="citation" data-cites="hansen2024tdmpc2 lin2025tdmpc2square">(<a href="#ref-hansen2024tdmpc2" role="doc-biblioref">Hansen et al. 2024</a>; <a href="#ref-lin2025tdmpc2square" role="doc-biblioref">Lin et al. 2025</a>)</span>, which plans in a learned latent model. It runs on the same task code with the same “reality” parameters. I compare at <strong>equal environment steps</strong>: the baseline at 150k against the 150k configurations, the baseline at 300k against the 300k runs, and the baseline’s full 1M-step run shown on its own, to see whether the learned model gets there eventually. <a href="#tbl-equal-steps" class="quarto-xref">Table&nbsp;2</a> lists the comparison points. The comparison has caveats. The baseline masks no terminal states in its TD targets (drop and timeout are both <code>done</code>), it evaluates on a different schedule, its hyperparameters differ, and it is a single run. </p>
+<p><a href="#fig-long_runs" class="quarto-xref">Figure&nbsp;5</a> already shows the ComFree side. For the hero configuration (E at 300k), the planner goes from 3.75 / 5.25 / 5.19 goals per episode at 150k (runs 1/2/3) to 5.50 / 5.81 / 6.12 at 300k. It is still rising slowly and has not converged. </p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Baseline run in progress
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The TD-MPC2 baseline run is in progress; this comparison will be added when it finishes. Until then, these are open questions, not findings:</p>
+<ul>
+<li><strong>h1.</strong> At 150k env steps, does the learned-model baseline solve fewer goals per episode than the planner through ComFree? </li>
+<li><strong>h2.</strong> Is the wall-clock cost per env step of the same order (roughly 27 env steps/s for the baseline vs 37–47 here, on differently loaded GPUs)? </li>
+<li><strong>h3.</strong> Is the baseline’s gap between policy and planner smaller, because its planner rolls out in the same latent space the policy is trained on? </li>
+</ul>
+<div id="tbl-equal-steps" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-equal-steps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Tail goals per episode (G) and drop rates at equal env steps. — = baseline run in progress. The 300k D row excludes one degenerate run.
+</figcaption>
+<div aria-describedby="tbl-equal-steps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>budget</th>
+<th>agent</th>
+<th>n</th>
+<th>planner G</th>
+<th>planner drop</th>
+<th>policy G</th>
+<th>policy drop</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>150k</td>
+<td>D (terminal Q)</td>
+<td>3</td>
+<td>4.72 ± 0.22</td>
+<td>0.02</td>
+<td>0.77 ± 0.28</td>
+<td>0.47</td>
+</tr>
+<tr class="even">
+<td>150k</td>
+<td>E (+ bc actor)</td>
+<td>3</td>
+<td>4.91 ± 0.37</td>
+<td>0.04</td>
+<td>0.80 ± 0.14</td>
+<td>0.26</td>
+</tr>
+<tr class="odd">
+<td>150k</td>
+<td>TD-MPC2 baseline</td>
+<td>1</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>300k</td>
+<td>D (terminal Q)</td>
+<td>2</td>
+<td>5.34 ± 0.07</td>
+<td>0.01</td>
+<td>1.61 ± 0.67</td>
+<td>0.43</td>
+</tr>
+<tr class="odd">
+<td>300k</td>
+<td>E (hero config)</td>
+<td>3</td>
+<td>5.60 ± 0.10</td>
+<td>0.00</td>
+<td>1.11 ± 0.25</td>
+<td>0.20</td>
+</tr>
+<tr class="even">
+<td>300k</td>
+<td>TD-MPC2 baseline</td>
+<td>1</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td>1M</td>
+<td>TD-MPC2 baseline</td>
+<td>1</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</div>
+</div>
+<div id="fig-long_runs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-long_runs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/long_runs.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-long_runs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Planner (blue) and policy (orange) goals per episode vs env steps (left) and vs wall-clock hours (right) for the 300k runs: E (n=3, the hero run as a thin line) and D (n=2, one degenerate run excluded). Dotted lines mark the equal-step comparison points at 150k and 300k. The TD-MPC2 baseline curve will be added when its run finishes. Runs used different GPUs.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="finding-3-sysid-identifies-the-contact-model-and-little-else" class="level3">
+<h3 class="anchored" data-anchor-id="finding-3-sysid-identifies-the-contact-model-and-little-else">Finding 3: SysID identifies the contact model and little else</h3>
+<p>SysID fits 71 parameters in 5 groups. Only one group clearly moves (<a href="#fig-sysid" class="quarto-xref">Figure&nbsp;6</a>). The error in the two ComFree contact constants roughly halves in every configuration: from 0.183 to 0.081 in rung C and from 0.184 to 0.083 in rung D. The 48 joint parameters stay flat (C: 0.085 → 0.082), and the inertial group gets worse (C: 0.085 → 0.118, D: 0.089 → 0.100). The mean error over all 71 parameters barely moves (D: 0.096 → 0.087). In 60k-step runs it has not moved yet (0.185 → 0.185). </p>
+<p>Turning SysID on (B→C) raises planner goals from 1.80 ± 0.23 to 2.56 ± 0.55 on the mean, but the spread is large, and the first run alone showed no gain. SysID probably helps the planner, but I cannot say by how much.</p>
+<p>My interpretation, which I have not tested: SysID fixes what the planner’s predictions are most sensitive to, the contact law. Masses and inertias are only weakly observable from 0.1 s replay chunks, so the fit trades them off against other parameters. The gap SysID closes here is parametric by construction (<a href="#sec-setup" class="quarto-xref">Section&nbsp;5</a>). </p>
+<div id="fig-sysid" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sysid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/sysid.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sysid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: SysID error <span class="math inline">|\hat u - u^\star|</span> per parameter group. Left: first vs last SysID call, pooled over rungs C–F at 150k. Right: error of the two ComFree contact constants over training for rungs C and D, mean and band over 3 repetitions.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="finding-4-the-policy-never-catches-up-with-the-planner" class="level3">
+<h3 class="anchored" data-anchor-id="finding-4-the-policy-never-catches-up-with-the-planner">Finding 4: The policy never catches up with the planner</h3>
+<p>In every 150k configuration, the policy’s tail is at most 1.08 goals per episode (means over 3 runs). With the terminal <span class="math inline">Q</span>, the planner reaches 3.7–4.9. On the ladder, the policy/planner ratio is 0.16–0.53 (<a href="#fig-planner_vs_policy" class="quarto-xref">Figure&nbsp;7</a>). <a href="#fig-planner_vs_policy_video" class="quarto-xref">Figure&nbsp;8</a> shows a typical case. The gap grows as the planner gets better: the policy’s imitation error on its own states, relative to planner states, rises from 1.05 in rung A to 2.04–2.35 in D–F (single run each). </p>
+<p>None of five levers closes the gap with n=3.</p>
+<ul>
+<li><strong>DAgger</strong> <span class="citation" data-cites="ross2011dagger">(<a href="#ref-ross2011dagger" role="doc-biblioref">Ross et al. 2011</a>)</span>: at β = 0.6 the ratio rises from 0.16 to 0.23, mostly because the planner loses goals (4.72 → 3.79). The policy gain is within the spread between runs. See <a href="#sec-app-dagger" class="quarto-xref">Section&nbsp;10.2</a>.</li>
+<li><strong>Fewer rollouts</strong>: at evaluation, rung D is at or above the DAgger checkpoint at every budget, and 3×64 samples keep about 88% of full-budget goals at half the plan time. Training with 128 instead of 256 samples costs the planner about 0.55 goals, and DAgger does not recover them. See <a href="#sec-app-budget" class="quarto-xref">Section&nbsp;10.3</a>.</li>
+<li><strong>Does the policy need <span class="math inline">Q</span>?</strong> Yes. Pure behaviour cloning of the planner gives fewer goals than keeping the <span class="math inline">Q</span> term (0.70 ± 0.13 vs 0.99 ± 0.08 for the F actor). See <a href="#sec-app-noq" class="quarto-xref">Section&nbsp;10.4</a>.</li>
+<li><strong>Network size</strong>: larger policies do slightly better (0.39 → 0.54 → 0.76), but the runs overlap. See <a href="#sec-app-netsize" class="quarto-xref">Section&nbsp;10.5</a>.</li>
+<li><strong>Offline consolidation</strong>: no clear gain over the same configuration without it. See <a href="#sec-app-offline" class="quarto-xref">Section&nbsp;10.6</a>.</li>
+</ul>
+<p>The repetitions contradict two earlier single-run claims. DAgger’s policy result of 1.38 goals (β = 0.3, final evaluation) came from the best of three runs. The other two reached 0.50 and 0.69, and the tail mean is 0.69 ± 0.09. The claim that SysID gives no gain held only for the first run. Because DAgger’s first run looked best, I built the reduced-rollout experiments on it. Only the repetitions, run last, showed it was a top draw. The lesson: repeat a result before building on it (<a href="#sec-app-reps" class="quarto-xref">Section&nbsp;10.7</a>).</p>
+<div id="fig-planner_vs_policy" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-planner_vs_policy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/planner_vs_policy.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-planner_vs_policy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Planner (blue) and policy (orange) tail goals per episode per ladder rung at 150k and for E at 300k, error bars = std over 3 repetitions. Drift = policy imitation error on its own states divided by that on planner states (single run per rung). The TD-MPC2 bar will be added when its run finishes.
+</figcaption>
+</figure>
+</div>
+<div id="fig-planner_vs_policy_video" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-planner_vs_policy_video-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-big-play-centered vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="videos/planner_vs_policy.mp4"></video></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-planner_vs_policy_video-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Rung D after 150k steps (single run): the planner reaches 4 goals, while the policy alone reaches none.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-limitations" class="level2">
+<h2 class="anchored" data-anchor-id="sec-limitations">Limitations and future work</h2>
+<ul>
+<li>“Reality” is ComFree with 71 perturbed parameters, so the sim-to-real gap SysID closes is purely parametric; there is no real robot. </li>
+<li>SysID uses batched central finite differences, not gradients through the simulator. </li>
+<li>Repetitions are same-seed reruns on a non-deterministic simulator, with n = 3 and 16 episodes per evaluation. </li>
+<li>3 of 78 runs are degenerate for reasons I did not investigate. </li>
+<li>The planner was still improving at 300k steps, so no configuration is converged. </li>
+<li>The drift-ratio diagnostics come from one run per configuration. </li>
+<li>The TD-MPC2 baseline is a single run with different hyperparameters and no terminal masking. </li>
+<li>The learned reward head is trained but never used. </li>
+</ul>
+<p><strong>A different contact model.</strong> The obvious next test changes what SysID cannot fix: the contact model. I built an evaluation that runs the trained agents in stock CPU MuJoCo <span class="citation" data-cites="todorov2012mujoco">(<a href="#ref-todorov2012mujoco" role="doc-biblioref">Todorov et al. 2012</a>)</span> on the same scene, parameters and task code, with only the contact solver changed (parameter parity checked to about 1e-7 relative error). The planner keeps planning through ComFree, synced to the MuJoCo state. Running it on the well-trained runs is the first item of future work. </p>
+<p><strong>Future work.</strong> Move to a real Allegro hand <span class="citation" data-cites="allegrohand">(<a href="#ref-allegrohand" role="doc-biblioref">Wonik Robotics, n.d.</a>)</span>, where the gap is no longer only parametric. Restrict SysID to the parameters short chunks can observe. Close the policy–planner gap, which none of my interventions did.</p>
+</section>
+<section id="sec-conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="sec-conclusion">Conclusion</h2>
+<p>Replacing TD-M(PC)²’s learned world model with ComFree works for in-hand cube reorientation, but only with a learned terminal value, which cuts the planner’s drop rate from 0.77 to 0.02. Online SysID corrects the contact constants and little else. The distilled policy stays far behind the planner, and none of my interventions closed that gap. Whether a learned world model does better at equal env steps is still open; the TD-MPC2 run has not finished yet.</p>
+</section>
+<section id="sec-code" class="level2">
+<h2 class="anchored" data-anchor-id="sec-code">Code and reproducibility</h2>
+<p>All code, configs and per-run logs are in one repository <span class="citation" data-cites="althaus2026tdmpccomfree">(<a href="#ref-althaus2026tdmpccomfree" role="doc-biblioref">Althaus 2026</a>)</span>. Conda environments are in <code>envs/comfree-tdmpc.yml</code> (agent, SysID, sim2sim) and <code>envs/tdmpc-baseline.yml</code> (TD-MPC2 baseline). Key commands:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> comfree_tdmpc</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># rung D, one run</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">MUJOCO_GL</span><span class="op">=</span>egl <span class="ex">python</span> scripts/train_vec.py <span class="at">--name</span> d_termq <span class="at">--out_root</span> outputs/ablation <span class="dt">\</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">--steps</span> 150000 <span class="at">--distill</span> <span class="at">--sysid</span> <span class="at">--terminal_value</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># the full A–F ladder</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="va">MUJOCO_GL</span><span class="op">=</span>egl <span class="ex">python</span> scripts/run_ablation.py <span class="at">--steps</span> 150000</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># aggregate all runs into the tables of this post</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../blogpost <span class="kw">&amp;&amp;</span> <span class="ex">python</span> scripts/aggregate_results.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Trained checkpoints are GitHub Release assets. <code>mujoco==3.6.0</code> and <code>warp-lang==1.14.0</code> are pinned exactly; Warp 1.16 fails at kernel code generation. My code is MIT-licensed, but <code>comfree_core</code> inside ComFree-Sim is under a noncommercial academic research license, which covers everything built on it. Runs used an RTX 4080, RTX 3070 or RTX 4090, so wall-clock times are not comparable across repetitions. </p>
+</section>
+<section id="acknowledgements" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="acknowledgements">Acknowledgements</h2>
+<p>This project was developed together with Jiayun Li. Claude (Anthropic) was used as an AI assistant for code development, analysis and drafting of this post; all results and conclusions were verified by the author.</p>
+</section>
+<section id="references" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-althaus2026tdmpccomfree" class="csl-entry" role="listitem">
+Althaus, Tim. 2026. <em><span class="nocase">tdmpc-comfree-allegro</span>: <span>TD-M(PC)²</span> with a <span>ComFree-Sim</span> Planner for <span>Allegro</span>-Hand Cube Reorientation</em>. GitHub repository. <a href="https://github.com/tja72/tdmpc-comfree-allegro">https://github.com/tja72/tdmpc-comfree-allegro</a>.
+</div>
+<div id="ref-borse2026comfree" class="csl-entry" role="listitem">
+Borse, Chetan, Zhixian Xie, Wei-Cheng Huang, and Wanxin Jin. 2026a. <em><span>ComFree-Sim</span>: A <span>GPU</span>-Parallelized Analytical Contact Physics Engine for Scalable Contact-Rich Robotics Simulation and Control</em>. <a href="https://arxiv.org/abs/2603.12185">https://arxiv.org/abs/2603.12185</a>.
+</div>
+<div id="ref-comfreewarp2026code" class="csl-entry" role="listitem">
+Borse, Chetan, Zhixian Xie, Wei-Cheng Huang, and Wanxin Jin. 2026b. <em><span class="nocase">comfree_warp</span>: <span>ComFree-Sim</span>, a <span>GPU</span>-Parallel Analytical Physics Engine with <span>MuJoCo</span> <span>API</span> Compatibility</em>. ASU IRIS Lab, released. <a href="https://github.com/asu-iris/comfree_warp">https://github.com/asu-iris/comfree_warp</a>.
+</div>
+<div id="ref-mujocowarp" class="csl-entry" role="listitem">
+Google DeepMind, and NVIDIA. 2025. <em><span>MuJoCo Warp (MJWarp)</span>: <span>GPU</span>-Accelerated <span>MuJoCo</span> for <span>NVIDIA</span> Hardware</em>. Released. <a href="https://github.com/google-deepmind/mujoco_warp">https://github.com/google-deepmind/mujoco_warp</a>.
+</div>
+<div id="ref-haarnoja2018sac" class="csl-entry" role="listitem">
+Haarnoja, Tuomas, Aurick Zhou, Pieter Abbeel, and Sergey Levine. 2018. <span>“Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor.”</span> <em>Proceedings of the 35th International Conference on Machine Learning (ICML)</em>, Proceedings of machine learning research, vol. 80: 1861–70. <a href="https://proceedings.mlr.press/v80/haarnoja18b.html">https://proceedings.mlr.press/v80/haarnoja18b.html</a>.
+</div>
+<div id="ref-hansen2024tdmpc2" class="csl-entry" role="listitem">
+Hansen, Nicklas, Hao Su, and Xiaolong Wang. 2024. <span>“<span>TD-MPC2</span>: Scalable, Robust World Models for Continuous Control.”</span> <em>International Conference on Learning Representations (ICLR)</em>. <a href="https://arxiv.org/abs/2310.16828">https://arxiv.org/abs/2310.16828</a>.
+</div>
+<div id="ref-jin2025comfree" class="csl-entry" role="listitem">
+Jin, Wanxin. 2025. <span>“Complementarity-Free Multi-Contact Modeling and Optimization for Dexterous Manipulation.”</span> <em>Robotics: Science and Systems XXI (RSS)</em>. <a href="https://doi.org/10.15607/RSS.2025.XXI.111">https://doi.org/10.15607/RSS.2025.XXI.111</a>.
+</div>
+<div id="ref-lin2025tdmpc2square" class="csl-entry" role="listitem">
+Lin, Haotian, Pengcheng Wang, Jeff Schneider, and Guanya Shi. 2025. <em><span>TD-M(PC)²</span>: Improving Temporal Difference <span>MPC</span> Through Policy Constraint</em>. <a href="https://arxiv.org/abs/2502.03550">https://arxiv.org/abs/2502.03550</a>.
+</div>
+<div id="ref-macklin2022warp" class="csl-entry" role="listitem">
+Macklin, Miles. 2022. <em>Warp: A High-Performance <span>Python</span> Framework for <span>GPU</span> Simulation and Graphics</em>. NVIDIA GPU Technology Conference (GTC). <a href="https://github.com/NVIDIA/warp">https://github.com/NVIDIA/warp</a>.
+</div>
+<div id="ref-ross2011dagger" class="csl-entry" role="listitem">
+Ross, Stéphane, Geoffrey Gordon, and Drew Bagnell. 2011. <span>“A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning.”</span> <em>Proceedings of the Fourteenth International Conference on Artificial Intelligence and Statistics (AISTATS)</em>, Proceedings of machine learning research, vol. 15: 627–35. <a href="https://proceedings.mlr.press/v15/ross11a.html">https://proceedings.mlr.press/v15/ross11a.html</a>.
+</div>
+<div id="ref-todorov2012mujoco" class="csl-entry" role="listitem">
+Todorov, Emanuel, Tom Erez, and Yuval Tassa. 2012. <span>“<span>MuJoCo</span>: A Physics Engine for Model-Based Control.”</span> <em>2012 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</em>, 5026–33. <a href="https://doi.org/10.1109/IROS.2012.6386109">https://doi.org/10.1109/IROS.2012.6386109</a>.
+</div>
+<div id="ref-williams2017mppi" class="csl-entry" role="listitem">
+Williams, Grady, Nolan Wagener, Brian Goldfain, et al. 2017. <span>“Information Theoretic <span>MPC</span> for Model-Based Reinforcement Learning.”</span> <em>2017 IEEE International Conference on Robotics and Automation (ICRA)</em>, 1714–21. <a href="https://doi.org/10.1109/ICRA.2017.7989202">https://doi.org/10.1109/ICRA.2017.7989202</a>.
+</div>
+<div id="ref-allegrohand" class="csl-entry" role="listitem">
+Wonik Robotics. n.d. <em><span>Allegro Hand</span></em>. Product page. <a href="https://www.allegrohand.com/">https://www.allegrohand.com/</a>.
+</div>
+</div>
+</section>
+<section id="sec-appendix" class="level2">
+<h2 class="anchored" data-anchor-id="sec-appendix">Appendix: detailed ablations</h2>
+<p>Numbers are tail means (last 3 planner, last 6 policy evaluations), mean ± std over n repetitions. G = goals per episode.</p>
+<section id="sec-app-table" class="level3">
+<h3 class="anchored" data-anchor-id="sec-app-table">All configurations</h3>
+<p><a href="#tbl-app-all" class="quarto-xref">Table&nbsp;3</a> lists every configuration I trained, and <a href="#fig-policy_gap" class="quarto-xref">Figure&nbsp;9</a> summarises the policy-gap interventions. Apart from rungs A–C and pure RL, all use rung D’s flags. † = contains one degenerate run that drops the cube in every evaluation; shown with and without it. </p>
+<div id="tbl-app-all" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-app-all-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Tail performance of every configuration. Rungs A–F are cumulative.
+</figcaption>
+<div aria-describedby="tbl-app-all-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>configuration</th>
+<th>steps</th>
+<th>n</th>
+<th>planner G</th>
+<th>planner drop</th>
+<th>policy G</th>
+<th>policy drop</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A: base (MPPI + Q/π learning)</td>
+<td>150k</td>
+<td>3</td>
+<td>1.44 ± 0.29</td>
+<td>0.73 ± 0.04</td>
+<td>0.40 ± 0.35</td>
+<td>0.86 ± 0.15</td>
+</tr>
+<tr class="even">
+<td>B: + distillation</td>
+<td>150k</td>
+<td>3</td>
+<td>1.80 ± 0.23</td>
+<td>0.78 ± 0.10</td>
+<td>0.94 ± 0.17</td>
+<td>0.80 ± 0.06</td>
+</tr>
+<tr class="odd">
+<td>C: + SysID</td>
+<td>150k</td>
+<td>3</td>
+<td>2.56 ± 0.55</td>
+<td>0.77 ± 0.13</td>
+<td>1.08 ± 0.28</td>
+<td>0.70 ± 0.08</td>
+</tr>
+<tr class="even">
+<td>D: + terminal Q</td>
+<td>150k</td>
+<td>3</td>
+<td>4.72 ± 0.22</td>
+<td>0.02 ± 0.00</td>
+<td>0.77 ± 0.28</td>
+<td>0.47 ± 0.04</td>
+</tr>
+<tr class="odd">
+<td>E: + BC actor</td>
+<td>150k</td>
+<td>3</td>
+<td>4.91 ± 0.37</td>
+<td>0.04 ± 0.02</td>
+<td>0.80 ± 0.14</td>
+<td>0.26 ± 0.05</td>
+</tr>
+<tr class="even">
+<td>F: + BC to planner mean</td>
+<td>150k</td>
+<td>3</td>
+<td>4.57 ± 0.28</td>
+<td>0.03 ± 0.01</td>
+<td>0.99 ± 0.08</td>
+<td>0.20 ± 0.02</td>
+</tr>
+<tr class="odd">
+<td>D config, pooled (D + net size default)</td>
+<td>150k</td>
+<td>6</td>
+<td>4.61 ± 0.43</td>
+<td>0.02 ± 0.02</td>
+<td>0.65 ± 0.22</td>
+<td>0.47 ± 0.07</td>
+</tr>
+<tr class="even">
+<td>D †</td>
+<td>300k</td>
+<td>3</td>
+<td>3.56 ± 3.09</td>
+<td>0.34 ± 0.57</td>
+<td>1.07 ± 1.04</td>
+<td>0.62 ± 0.33</td>
+</tr>
+<tr class="odd">
+<td>D, excl. degenerate</td>
+<td>300k</td>
+<td>2</td>
+<td>5.34 ± 0.07</td>
+<td>0.01 ± 0.01</td>
+<td>1.61 ± 0.67</td>
+<td>0.43 ± 0.06</td>
+</tr>
+<tr class="even">
+<td>E (hero config)</td>
+<td>300k</td>
+<td>3</td>
+<td>5.60 ± 0.10</td>
+<td>0.00 ± 0.00</td>
+<td>1.11 ± 0.25</td>
+<td>0.20 ± 0.04</td>
+</tr>
+<tr class="odd">
+<td>net size small</td>
+<td>150k</td>
+<td>3</td>
+<td>4.56 ± 0.12</td>
+<td>0.05 ± 0.02</td>
+<td>0.39 ± 0.13</td>
+<td>0.31 ± 0.08</td>
+</tr>
+<tr class="even">
+<td>net size default</td>
+<td>150k</td>
+<td>3</td>
+<td>4.50 ± 0.61</td>
+<td>0.03 ± 0.03</td>
+<td>0.54 ± 0.08</td>
+<td>0.47 ± 0.10</td>
+</tr>
+<tr class="odd">
+<td>net size large</td>
+<td>150k</td>
+<td>3</td>
+<td>4.30 ± 0.24</td>
+<td>0.03 ± 0.01</td>
+<td>0.76 ± 0.20</td>
+<td>0.44 ± 0.04</td>
+</tr>
+<tr class="even">
+<td>E without Q (pure BC) †</td>
+<td>150k</td>
+<td>3</td>
+<td>3.17 ± 2.76</td>
+<td>0.35 ± 0.57</td>
+<td>0.35 ± 0.30</td>
+<td>0.48 ± 0.45</td>
+</tr>
+<tr class="odd">
+<td>E without Q, excl. degenerate</td>
+<td>150k</td>
+<td>2</td>
+<td>4.76 ± 0.28</td>
+<td>0.02 ± 0.03</td>
+<td>0.52 ± 0.03</td>
+<td>0.22 ± 0.06</td>
+</tr>
+<tr class="even">
+<td>F without Q (pure BC)</td>
+<td>150k</td>
+<td>3</td>
+<td>4.44 ± 0.34</td>
+<td>0.02 ± 0.04</td>
+<td>0.70 ± 0.13</td>
+<td>0.27 ± 0.08</td>
+</tr>
+<tr class="odd">
+<td>DAgger β = 0</td>
+<td>150k</td>
+<td>3</td>
+<td>4.53 ± 0.25</td>
+<td>0.03 ± 0.03</td>
+<td>0.62 ± 0.16</td>
+<td>0.26 ± 0.01</td>
+</tr>
+<tr class="even">
+<td>DAgger β = 0.3</td>
+<td>150k</td>
+<td>3</td>
+<td>4.29 ± 0.45</td>
+<td>0.04 ± 0.04</td>
+<td>0.69 ± 0.09</td>
+<td>0.18 ± 0.07</td>
+</tr>
+<tr class="odd">
+<td>DAgger β = 0.6</td>
+<td>150k</td>
+<td>3</td>
+<td>3.79 ± 0.11</td>
+<td>0.09 ± 0.06</td>
+<td>0.89 ± 0.21</td>
+<td>0.18 ± 0.03</td>
+</tr>
+<tr class="even">
+<td>D, 128 samples in training</td>
+<td>150k</td>
+<td>3</td>
+<td>4.17 ± 0.15</td>
+<td>0.02 ± 0.02</td>
+<td>0.77 ± 0.05</td>
+<td>0.39 ± 0.06</td>
+</tr>
+<tr class="odd">
+<td>DAgger β = 0.3, 128 samples</td>
+<td>150k</td>
+<td>3</td>
+<td>3.69 ± 0.22</td>
+<td>0.05 ± 0.05</td>
+<td>0.88 ± 0.20</td>
+<td>0.18 ± 0.02</td>
+</tr>
+<tr class="even">
+<td>offline v1, trigger 0.15</td>
+<td>150k</td>
+<td>3</td>
+<td>4.66 ± 0.15</td>
+<td>0.01 ± 0.01</td>
+<td>0.66 ± 0.23</td>
+<td>0.52 ± 0.07</td>
+</tr>
+<tr class="odd">
+<td>offline v1, trigger 0.1 (pooled)</td>
+<td>150k</td>
+<td>6</td>
+<td>4.67 ± 0.23</td>
+<td>0.02 ± 0.02</td>
+<td>0.78 ± 0.19</td>
+<td>0.51 ± 0.02</td>
+</tr>
+<tr class="even">
+<td>offline v2: no offline phase †</td>
+<td>60k</td>
+<td>3</td>
+<td>2.27 ± 2.00</td>
+<td>0.44 ± 0.49</td>
+<td>0.33 ± 0.31</td>
+<td>0.70 ± 0.27</td>
+</tr>
+<tr class="odd">
+<td>offline v2: no offline phase, excl. degenerate</td>
+<td>60k</td>
+<td>2</td>
+<td>3.41 ± 0.52</td>
+<td>0.17 ± 0.12</td>
+<td>0.49 ± 0.19</td>
+<td>0.55 ± 0.09</td>
+</tr>
+<tr class="even">
+<td>offline v2: forced at 20k</td>
+<td>60k</td>
+<td>3</td>
+<td>3.40 ± 0.35</td>
+<td>0.17 ± 0.07</td>
+<td>0.26 ± 0.11</td>
+<td>0.58 ± 0.07</td>
+</tr>
+<tr class="odd">
+<td>offline v2: forced at 45k</td>
+<td>60k</td>
+<td>3</td>
+<td>3.58 ± 0.08</td>
+<td>0.11 ± 0.09</td>
+<td>0.37 ± 0.20</td>
+<td>0.49 ± 0.04</td>
+</tr>
+<tr class="even">
+<td>offline v2: periodic</td>
+<td>60k</td>
+<td>3</td>
+<td>3.62 ± 0.18</td>
+<td>0.06 ± 0.04</td>
+<td>0.50 ± 0.29</td>
+<td>0.41 ± 0.04</td>
+</tr>
+<tr class="odd">
+<td>pure RL (SAC, no planner)</td>
+<td>150k</td>
+<td>3</td>
+<td>—</td>
+<td>—</td>
+<td>0.00 ± 0.00</td>
+<td>1.00 ± 0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="fig-policy_gap" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-policy_gap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/policy_gap.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-policy_gap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Policy-gap interventions: planner and policy tail G (mean ± std, n = 3 unless stated) vs.&nbsp;rung D. The policy moves little and never approaches the planner.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-app-dagger" class="level3">
+<h3 class="anchored" data-anchor-id="sec-app-dagger">DAgger and the policy–planner gap</h3>
+<p><strong>Change.</strong> Rung D with the actor cloning the planner’s mean action (<code>bc_mu</code>), plus DAgger <span class="citation" data-cites="ross2011dagger">(<a href="#ref-ross2011dagger" role="doc-biblioref">Ross et al. 2011</a>)</span>: with probability β the policy’s action is executed, and the planner’s action is still the label. β ∈ {0, 0.3, 0.6}, n = 3 each.</p>
+<p><strong>Result.</strong> Policy G rises from 0.62 ± 0.16 (β = 0) to 0.69 ± 0.09 (β = 0.3) and 0.89 ± 0.21 (β = 0.6), against 0.77 ± 0.28 for rung D. The planner pays: 4.53 ± 0.25, 4.29 ± 0.45, 3.79 ± 0.11 (D: 4.72 ± 0.22). The policy/planner ratio rises from 0.16 (D) to 0.23 at β = 0.6, mostly because the planner gets worse. Policy drops fall from 0.47 (D) to 0.26 with <code>bc_mu</code> alone and 0.18 with DAgger. </p>
+<p><strong>Verdict.</strong> Safer policy; the gain in goals is within the spread, and the gap stays.</p>
+</section>
+<section id="sec-app-budget" class="level3">
+<h3 class="anchored" data-anchor-id="sec-app-budget">Planning with fewer rollouts</h3>
+<p><strong>Change (evaluation).</strong> DAgger β = 0.3 and rung D checkpoints re-evaluated with fewer MPPI iterations × samples, 32 episodes per cell, n = 3 per arm. </p>
+<p><strong>Result.</strong> At full budget (3 × 256): rung D 4.76 ± 0.33, DAgger 4.64 ± 0.52. Rung D is at or above DAgger in all 6 cells on the mean; DAgger leads only in repetition 1. Both degrade gracefully: for rung D, 3 × 64 keeps ≈ 88% of the goals (4.18 vs 4.76) at half the plan time (<a href="#fig-rollout_budget" class="quarto-xref">Figure&nbsp;10</a>). </p>
+<p><strong>Change (training).</strong> Both trained with 128 instead of 256 samples, n = 3. The rung-D planner falls to 4.17 ± 0.15 with an unchanged policy (0.77 ± 0.05); DAgger’s planner reaches 3.69 ± 0.22 (policy 0.88 ± 0.20). </p>
+<p><strong>Verdict.</strong> DAgger does not buy cheaper planning, at evaluation or in training.</p>
+<div id="fig-rollout_budget" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rollout_budget-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/rollout_budget.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rollout_budget-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Rollout budget at evaluation: G vs.&nbsp;ms per plan call (log scale), DAgger β = 0.3 vs.&nbsp;rung D, mean ± std over n = 3; labels = iterations × samples. Faint: repetition 1, which suggested DAgger allows cheaper planning.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-app-noq" class="level3">
+<h3 class="anchored" data-anchor-id="sec-app-noq">Does the policy need Q?</h3>
+<p><strong>Change.</strong> Rungs E and F without the Q term in the actor loss: pure behaviour cloning of the planner. Q still trains for the planner.</p>
+<p><strong>Result.</strong> Policy G drops from 0.80 ± 0.14 (E) to 0.52 ± 0.03 (n = 2, one degenerate run excluded) and from 0.99 ± 0.08 (F) to 0.70 ± 0.13 (n = 3). The planner is unaffected (4.76 ± 0.28, 4.44 ± 0.34). </p>
+<p><strong>Verdict.</strong> Keeping Q in the actor loss gives the better policy.</p>
+</section>
+<section id="sec-app-netsize" class="level3">
+<h3 class="anchored" data-anchor-id="sec-app-netsize">Policy network size</h3>
+<p><strong>Change.</strong> Rung D with MLP and latent width 128 (small), the default (384 and 256), or 512 (large), n = 3 each. </p>
+<p><strong>Result.</strong> Policy G 0.39 ± 0.13, 0.54 ± 0.08 and 0.76 ± 0.20; the planner is unaffected (4.56, 4.50, 4.30). </p>
+<p><strong>Verdict.</strong> Slightly better on the mean, but the repetitions overlap; capacity is not the main limit.</p>
+</section>
+<section id="sec-app-offline" class="level3">
+<h3 class="anchored" data-anchor-id="sec-app-offline">Offline consolidation phase</h3>
+<p><strong>Change (v1).</strong> Rung D plus one burst of 50k extra gradient updates on the replay buffer, triggered when the SysID held-out loss falls below 0.15 or 0.1 (n = 3 and 6). </p>
+<p><strong>Result.</strong> Planner 4.66–4.78, policy 0.66–0.89, vs.&nbsp;4.61 ± 0.43 and 0.65 ± 0.22 for rung D pooled (n = 6). In one run the phase never fired. <strong>v2</strong> (60k steps: no phase, forced at 20k or 45k, periodic; n = 3 each): no condition separates, and the periodic trigger fired in 1 of 3 runs. </p>
+<p><strong>Verdict.</strong> No clear gain, at 4–5 h instead of about 1 h per run. </p>
+</section>
+<section id="sec-app-reps" class="level3">
+<h3 class="anchored" data-anchor-id="sec-app-reps">Single runs vs repetitions</h3>
+<p>DAgger’s first run (β = 0.3) gave the best single-run policy, 1.38 G, so I took DAgger to be the fix and built both reduced-rollout experiments on it before repeating it. The repetitions came last: 0.50 and 0.69, and DAgger’s rollout-budget advantage was the same top draw. </p>
+<p>Identical configurations vary a lot: six rung-D runs end between 3.88 and 5.75 planner G. Headline numbers in my earlier log (5.63, 5.75, 1.38) are top draws. Two more claims were rep-1 artefacts: SysID giving no gain over B (with n = 3, C is above B on the mean, with a large spread) and the terminal Q “more than doubling” the planner (×1.8 vs C). What held: the terminal Q as the largest step, the policy gap, pure RL failing, and SysID fixing only the contact constants.</p>
+<p><strong>Lesson.</strong> An experiment built on a single run inherits its luck. Repetitions cost about an hour each and belong before the follow-ups, not after. </p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tja72\.github\.io\/tdmpc-comfree-allegro\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<script>videojs(video_shortcode_videojs_video1);</script>
+
+
+
+
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
