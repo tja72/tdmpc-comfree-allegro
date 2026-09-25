@@ -1,0 +1,23 @@
+# ComFree-Sim planner agent (comfree_tdmpc): training, ablations, report figures.
+#   conda env create -f envs/comfree-tdmpc.yml
+#   conda activate comfree-tdmpc
+#   pip install -e comfree_warp -e comfree_tdmpc
+name: comfree-tdmpc
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu121
+      - torch==2.5.1+cu121
+      # Exact pin: warp 1.16 rejects a latent bug in comfree_warp's vendored
+      # mujoco_warp/_src/sensor.py (_frame_axis reads an undefined xmat).
+      - warp-lang==1.14.0
+      - mujoco==3.6.0
+      - numpy
+      - imageio[ffmpeg]
+      - matplotlib
+      - pillow
+      - tqdm
+      - reportlab

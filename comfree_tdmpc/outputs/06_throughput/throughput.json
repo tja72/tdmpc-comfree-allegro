@@ -1,0 +1,103 @@
+{
+  "sim": [
+    {
+      "nworld": 1,
+      "ctrl_step_ms": 2.6507470749493223,
+      "python_ms": 0.022178224753588438,
+      "phys_steps_per_s": 3772.521375013187,
+      "ctrl_steps_per_s": 377.2521375013187,
+      "finite": true
+    },
+    {
+      "nworld": 64,
+      "ctrl_step_ms": 4.24085825070506,
+      "python_ms": 0.026999100373359397,
+      "phys_steps_per_s": 150912.84880686534,
+      "ctrl_steps_per_s": 15091.284880686533,
+      "finite": true
+    },
+    {
+      "nworld": 128,
+      "ctrl_step_ms": 4.557464399840683,
+      "python_ms": 0.02549700002418831,
+      "phys_steps_per_s": 280857.92618473235,
+      "ctrl_steps_per_s": 28085.792618473235,
+      "finite": true
+    },
+    {
+      "nworld": 256,
+      "ctrl_step_ms": 4.915373374387855,
+      "python_ms": 0.03314137502457015,
+      "phys_steps_per_s": 520814.96257012506,
+      "ctrl_steps_per_s": 52081.496257012506,
+      "finite": true
+    },
+    {
+      "nworld": 512,
+      "ctrl_step_ms": 5.521672674512956,
+      "python_ms": 0.02539212509873323,
+      "phys_steps_per_s": 927255.2543059996,
+      "ctrl_steps_per_s": 92725.52543059996,
+      "finite": true
+    },
+    {
+      "nworld": 1024,
+      "ctrl_step_ms": 7.45138942511403,
+      "python_ms": 0.025664750137366354,
+      "phys_steps_per_s": 1374240.348449282,
+      "ctrl_steps_per_s": 137424.03484492822,
+      "finite": true
+    },
+    {
+      "nworld": 2048,
+      "ctrl_step_ms": 13.27200162486406,
+      "python_ms": 0.02623272521304898,
+      "phys_steps_per_s": 1543098.0630406432,
+      "ctrl_steps_per_s": 154309.80630406432,
+      "finite": true
+    },
+    {
+      "nworld": 4096,
+      "ctrl_step_ms": 22.76579555036733,
+      "python_ms": 0.027097999554825947,
+      "phys_steps_per_s": 1799190.3647460765,
+      "ctrl_steps_per_s": 179919.03647460765,
+      "finite": true
+    }
+  ],
+  "plan": [
+    {
+      "nworld": 256,
+      "plan_ms": 330.50201589940116,
+      "plan_ms_sim_only": 326.06471219914965,
+      "learned_overhead_ms": 4.437303700251471,
+      "sim_steps_in_plan": 64,
+      "env_steps_per_s": 3.0257001527772283
+    },
+    {
+      "nworld": 1024,
+      "plan_ms": 491.9767747982405,
+      "plan_ms_sim_only": 476.65079699945636,
+      "learned_overhead_ms": 15.325977798784196,
+      "sim_steps_in_plan": 64,
+      "env_steps_per_s": 2.0326162762664954
+    }
+  ],
+  "update": [
+    {
+      "batch_size": 256,
+      "update_ms": 7.385869580321014,
+      "updates_per_s": 135.39367154064163
+    },
+    {
+      "batch_size": 512,
+      "update_ms": 7.508852980099618,
+      "updates_per_s": 133.17613257980358
+    },
+    {
+      "batch_size": 1024,
+      "update_ms": 8.21338907990139,
+      "updates_per_s": 121.75242037992021
+    }
+  ]
+}

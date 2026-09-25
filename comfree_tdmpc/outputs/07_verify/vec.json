@@ -1,0 +1,85 @@
+{
+  "correctness": {
+    "vec env reproduces single env": {
+      "ok": true,
+      "detail": "step 1: 3.0e-08 (floor 4.7e-10)   step 40: 1.2e-05 (floor 1.0e-05)",
+      "step1": 2.9802322387695312e-08,
+      "step1_floor": 4.656612873077393e-10,
+      "final": 1.2189149856567383e-05,
+      "final_floor": 1.0013580322265625e-05
+    },
+    "batched rollout matches single rollout": {
+      "ok": true,
+      "detail": "H=1: 5.0e-05 (floor 6.0e-05)   H=8: 1.0e-02 (floor 1.2e-02)",
+      "h1": 4.998983308166152e-05,
+      "h1_floor": 5.9928169678413314e-05,
+      "hH": 0.010397514968172844,
+      "hH_floor": 0.011952606063200998
+    },
+    "each env is scored against its own goal": {
+      "ok": true,
+      "detail": "max |dvalue|/scale=8.4e-03  (goals differ by 39.4)",
+      "rel_err": 0.008425517129510429,
+      "goal_spread": 39.38853073120117
+    },
+    "each env receives its own action": {
+      "ok": true,
+      "detail": "max |dqpos|=1.2e-07  (actions differ by 1.8e-01)",
+      "err": 1.1920928955078125e-07,
+      "spread": 0.1780109405517578
+    },
+    "lanes do not interact": {
+      "ok": true,
+      "detail": "other lanes moved 5.3e-03 (floor 6.1e-03), lane 0 moved 2.0e-01",
+      "leak": 0.005323886871337891,
+      "floor": 0.006053328514099121,
+      "lane0": 0.2031354308128357
+    },
+    "buffer chunks are contiguous": {
+      "ok": true,
+      "detail": "same lane=True  consecutive t=True  shape=True"
+    }
+  },
+  "throughput": [
+    {
+      "num_envs": 1,
+      "worlds": 256,
+      "iter_ms": 161.66964599930603,
+      "env_steps_per_s": 6.185453019451113,
+      "elite_transitions_per_s": 395.8689932448712,
+      "speedup": 1.0
+    },
+    {
+      "num_envs": 4,
+      "worlds": 1024,
+      "iter_ms": 235.70127533215177,
+      "env_steps_per_s": 16.97063367333577,
+      "elite_transitions_per_s": 1086.1205550934892,
+      "speedup": 2.7436363383520965
+    },
+    {
+      "num_envs": 8,
+      "worlds": 2048,
+      "iter_ms": 369.5268184989497,
+      "env_steps_per_s": 21.64930824911897,
+      "elite_transitions_per_s": 1385.555727943614,
+      "speedup": 3.50003600076492
+    },
+    {
+      "num_envs": 16,
+      "worlds": 4096,
+      "iter_ms": 617.1387147502779,
+      "env_steps_per_s": 25.92609994735838,
+      "elite_transitions_per_s": 1659.2703966309364,
+      "speedup": 4.191463400632056
+    },
+    {
+      "num_envs": 32,
+      "worlds": 8192,
+      "iter_ms": 1198.1530814155121,
+      "env_steps_per_s": 26.70777256792164,
+      "elite_transitions_per_s": 1709.297444346985,
+      "speedup": 4.317836136485869
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+# Python / build
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+.idea/
+.vscode/
+
+# Local notes and logs
+MUJOCO_LOG.TXT
+blogpost/_drafts/
+.scratch*/
+
+# Quarto build output
+blogpost/_site/
+blogpost/.quarto/
+
+# Training artifacts
+*.pt
+wandb/
+*.log
+*.log.gz
+
+# comfree_tdmpc outputs: keep per-run config/csv/json/npy and report figures only
+comfree_tdmpc/outputs/**/videos/
+comfree_tdmpc/outputs/dashboard/
+comfree_tdmpc/outputs/pilot/
+comfree_tdmpc/outputs/**/_crashed_partial/
+comfree_tdmpc/outputs/**/smoke_*/
+comfree_tdmpc/outputs/report/gifs/
+comfree_tdmpc/outputs/report/gifs_test/
+
+# tdmpc-square-pearl run outputs (hydra dirs, logs, checkpoints)
+tdmpc-square-pearl/logs/
+tdmpc-square-pearl/outputs/
+tdmpc-square-pearl/data/
+tdmpc-square-pearl/models/
+
+# sim2sim: only the summary tables are tracked
+sim2sim/outputs/*
+!sim2sim/outputs/summary_table.csv
+!sim2sim/outputs/summary_table.md

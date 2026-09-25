@@ -1,0 +1,9 @@
+# Defaults for task=comfree-allegro-cube (envs/comfree_allegro.py).
+# Override from the CLI with +comfree_allegro.<key>=<value>.
+# All values match comfree_tdmpc's VecTrainConfig defaults, which is what every
+# ../comfree_tdmpc/outputs/ablation run used -- change them only on purpose.
+episode_length: 120    # control steps at 50 Hz (VecEnvConfig.episode_length)
+reality_perturb: 0.25  # u-space displacement of reality from the nominal model
+reality_seed: 12345    # fixes *which* reality; independent of the run seed
+seed: null             # env RNG (goals, reset noise); null -> the run's cfg.seed
+device: cuda:0         # comfree_tdmpc hardcodes cuda:0 as well

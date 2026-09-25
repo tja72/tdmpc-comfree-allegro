@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "comfree_tdmpc"
+version = "0.1.0"
+description = "TD-M(PC)^2-style agent with the ComFree-Sim analytic-contact simulator as planner dynamics"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "torch",
+    "warp-lang==1.14.0",
+    "mujoco==3.6.0",
+    "numpy>=1.24",
+    "imageio[ffmpeg]>=2.31",
+    "matplotlib>=3.7",
+    "pillow",
+    "tqdm>=4.65",
+]
+
+[project.optional-dependencies]
+report = ["reportlab"]
+
+[tool.setuptools]
+packages = [
+    "comfree_tdmpc",
+    "comfree_tdmpc.envs",
+    "comfree_tdmpc.sim",
+    "comfree_tdmpc.planner",
+    "comfree_tdmpc.agent",
+    "comfree_tdmpc.sysid",
+]

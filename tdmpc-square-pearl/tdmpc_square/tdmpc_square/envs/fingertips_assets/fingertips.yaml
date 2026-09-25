@@ -1,0 +1,79 @@
+# Defaults for the fingertips environment. Override via CLI, e.g.:
+#   python -m tdmpc_square.train task=fingertips-cube-air +fingertips.reward.style=shaped
+# make_env() merges cfg.fingertips over this file.
+
+sim:
+  n_qpos: 16
+  n_qvel: 15
+  n_cmd: 9
+  init_robot_qpos: [0.2, 0.0, 0.0, 0.0, 0.2, 0.0, -0.2, 0.0, 0.0]
+  frame_skip: 10       # sim dt 0.002s * frame_skip=10 -> 50 Hz control
+  action_bound: 0.005  # per-step fingertip displacement bound (m)
+
+episode:
+  max_episode_steps: 500
+  success_pos_threshold: 0.02
+  success_quat_threshold: 0.015
+
+reward:
+  style: legacy   # legacy | shaped -- terms defined in envs/fingertips_assets/rewards.py
+
+  # ported MPC cost (init_cost_fns). reward = (baseline - cost) / scale. position/
+  # quaternion weights are /4 vs. the original to account for its per-decision 4x
+  # path-cost / 1x final-cost split. baseline/scale measured from cost() at reset()
+  # (540 samples across all variants): mean=16.2, std=7.6.
+  legacy:
+    contact_cost_weight: 1.0
+    grasp_closure_weight: 0.05
+    control_cost_weight: 50.0
+    position_cost_weight: 1250.0
+    quaternion_cost_weight: 12.5
+    baseline: 16.2
+    scale: 10.0
+
+  # same 5 quantities as bounded terms. Built after finding random/CEM exploration never
+  # makes real fingertip-object contact under "legacy" (0/7500 random steps measured), so
+  # its position/quaternion/grasp terms are effectively unlearnable. reach/control run
+  # every step; absolute tracking is gated to 0 until real contact exists, grasp has its
+  # own soft proximity gate, progress terms are never gated. Values below are grounded in
+  # measured stats across all 9 object/variant combos (reset-only sampling + a scripted
+  # reach-then-push-toward-target rollout, not random actions).
+  shaped:
+    finger_obj_distance:
+      weight: 1.0
+      std: 0.15  # driven by the farthest fingertip (see rewards.py) -- measured mean
+                 # closest-approach distance; reset-time mean dist was 0.20
+    grasp_distribution:
+      weight: 1.0
+      std: 3.0  # std^2=9 == closure's max (sum of 3 unit vecs) -- old std=1.0 gave exp(-x)~=0
+                # for 90% of measured in-contact closures (typical 7.4, only top ~10% below 2.5)
+      gate_std: 0.05  # tight vs. finger_obj_distance.std -- ~contact distance (fingertip r=0.01 + obj half-extent), not long-range shaping
+    tracking_gate_std: 0.05  # continuous engagement gate for position/quaternion_tracking's
+                              # absolute terms below; same near-contact scale as
+                              # grasp_distribution.gate_std, kept separate so they can diverge
+    ctrl_magnitude:
+      weight: -100.0  # max |cmd|^2 = 9*action_bound^2 = 0.000225 -- even at this weight the
+                       # term maxes out at -0.023, dwarfed by every other term. Can't be pushed
+                       # much further: doing so would start penalizing legitimate fast reaching,
+                       # not just jitter. The 5mm action_bound is the real effort regularizer.
+    position_tracking:
+      weight: 7.5             # absolute -- 1:1 with quaternion_tracking.weight (was 3:1).
+                               # Position converged to near-exact tracking while quaternion
+                               # tracking plateaued well short of the goal, so weight moved
+                               # toward the bottleneck; sum held at 15 to change only the split.
+      progress_weight: 65.0   # potential-based -- pays for reducing error, not lucky starts.
+                               # 1:1 with quaternion_tracking.progress_weight (was 100/30),
+                               # sum held at 130.
+      std: 0.15  # measured reset pos_err: mean=0.083, p90=0.124, max=0.150
+      progress_std: 0.3  # wider than std -- absolute wants sharp precision near the goal,
+                          # progress wants its productive (tanh knee) band to cover more of
+                          # the reach-to-success arc so far-off progress isn't discounted
+    quaternion_tracking:
+      weight: 7.5              # 1:1 with position_tracking.weight, see there. std left
+                                # untouched: broadening it would flatten the gradient near
+                                # the goal, exactly where more pull is wanted.
+      progress_weight: 65.0   # 1:1 with position_tracking.progress_weight, see there.
+      std: 0.5  # measured reset quat_err: mean=0.589 (bounded [0,1] by construction)
+      progress_std: 1.0  # same widening rationale as position_tracking.progress_std
+# max (best-case) per-step rewards:
+#   reach=1.0, grasp≈1.0, pos_abs=7.5, quat_abs=7.5, pos_progress≈0.52, quat_progress≈0.377, ctrl_magnitude=-0.0225

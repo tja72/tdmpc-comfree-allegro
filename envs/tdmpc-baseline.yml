@@ -1,0 +1,32 @@
+# TD-MPC2 / TD-M(PC)^2 baseline (tdmpc-square-pearl) on the comfree-allegro-cube
+# task, plus sim2sim evaluation of both agent types.
+#   conda env create -f envs/tdmpc-baseline.yml
+#   conda activate tdmpc-baseline
+#   pip install -e comfree_warp -e comfree_tdmpc
+#   pip install -e tdmpc-square-pearl/tdmpc_square --no-deps
+name: tdmpc-baseline
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu121
+      - torch==2.3.1+cu121
+      - torchrl==0.4.0
+      - tensordict==0.4.0
+      - hydra-core==1.3.2
+      - hydra-submitit-launcher==1.2.0
+      - pandas==2.2.2
+      - termcolor==2.4.0
+      # gymnasium>=1.0 dropped Wrapper.__getattr__ forwarding, which
+      # TensorWrapper/make_env rely on.
+      - gymnasium==0.29.1
+      - numpy<2
+      - warp-lang==1.14.0
+      - mujoco==3.6.0
+      - imageio[ffmpeg]
+      - matplotlib
+      - moviepy
+      - tqdm
+      - wandb

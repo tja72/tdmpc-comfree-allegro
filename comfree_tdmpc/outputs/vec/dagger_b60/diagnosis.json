@@ -1,0 +1,18 @@
+{
+  "imitation_error/planner_states": 0.24702869355678558,
+  "imitation_error/policy_states": 0.4411742389202118,
+  "action_std/policy": 0.34629595279693604,
+  "action_std/planner": 0.47887253761291504,
+  "action_absmean/policy": 0.3920454680919647,
+  "action_absmean/planner": 0.4966835677623749,
+  "elite_spread/mean_abs_dev": 0.10920291185379029,
+  "elite_spread/std": 0.13806589156389237,
+  "elite_spread/value_range_rel": 0.05673102972097695,
+  "elite_spread/k": 8.0,
+  "value/q_mean": 125.87373352050781,
+  "value/mc_return_mean": 95.88928985595703,
+  "value/bias": 29.984434127807617,
+  "value/corr": 0.3583266623504728,
+  "return/planner_driving": 854.0172729492188,
+  "return/policy_driving": -52.688289642333984
+}

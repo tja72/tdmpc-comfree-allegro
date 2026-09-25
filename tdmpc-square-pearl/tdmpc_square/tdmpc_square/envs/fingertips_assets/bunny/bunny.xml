@@ -1,0 +1,19 @@
+<!-- ASSET -->
+<mesh name="object" file="bunny.stl" scale="0.8 0.8 0.8"/>
+<!-- BODY -->
+<camera name="demo-cam" pos="0.086 -0.324 0.157" xyaxes="0.966 0.259 0.000 -0.102 0.380 0.919"/>
+<camera name="demo-cam2" pos="0.070 -0.509 0.164" xyaxes="0.991 0.132 -0.000 -0.032 0.243 0.969"/>
+<camera name="demo-cam3" pos="-0.001 -0.368 0.475" xyaxes="1.000 -0.003 0.000 0.002 0.790 0.613"/>
+<body name="goal">
+    <geom name="goal" type="mesh" mesh="object" conaffinity="0" contype="0"
+        pos="0.015 0.0 -0.005" quat="1 0 0 0"
+        rgba="0.0 0.5 0.0 0.3"/>
+</body>
+<body name="obj">
+    <freejoint name="object_table"/>
+    <geom name="obj" type="mesh" mesh="object"
+        pos="0.015 0.0 -0.005" quat="1 0 0 0"
+        mass="0.01"
+        condim="6"
+        friction="0.9" rgba="0.5 0.5 0.5 1.0"/>
+</body>
